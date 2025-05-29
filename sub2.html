@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>白背景 清潔系チャートデザイン</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #f8fffe 0%, #f0f9f7 100%);
+            color: #2d3748;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 背景パターン */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 20%, rgba(52, 211, 153, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(16, 185, 129, 0.02) 0%, transparent 50%);
+            animation: backgroundFloat 20s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes backgroundFloat {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(20px) translateY(-20px); }
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 3.5em;
+            font-weight: 700;
+            background: linear-gradient(135deg, #059669, #34d399, #6ee7b7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 15px;
+            animation: headerShimmer 4s ease-in-out infinite alternate;
+        }
+
+        @keyframes headerShimmer {
+            0% { filter: brightness(1) saturate(1); }
+            100% { filter: brightness(1.1) saturate(1.2); }
+        }
+
+        .subtitle {
+            font-size: 1.3em;
+            color: #6b7280;
+            font-weight: 300;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 40px;
+            margin-bottom: 60px;
+        }
+
+        .chart-frame {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 25px;
+            padding: 35px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.03),
+                0 1px 3px rgba(0, 0, 0, 0.05);
+            transition: all 0.4s ease;
+            min-height: 500px;
+        }
+
+        .chart-frame:hover {
+            transform: translateY(-8px);
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.08),
+                0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Frame 1: Aloe Fresh - 白緑のアロエ系 */
+        .aloe-frame {
+            border: 2px solid rgba(52, 211, 153, 0.15);
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.98) 0%, 
+                    rgba(240, 253, 250, 0.95) 100%
+                );
+        }
+
+        .aloe-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 30% 40%, rgba(52, 211, 153, 0.08), transparent 60%),
+                radial-gradient(circle at 70% 60%, rgba(16, 185, 129, 0.05), transparent 60%);
+            animation: aloeFlow 15s ease-in-out infinite alternate;
+        }
+
+        @keyframes aloeFlow {
+            0% { 
+                opacity: 0.6; 
+                transform: rotate(0deg) scale(1);
+            }
+            100% { 
+                opacity: 1; 
+                transform: rotate(5deg) scale(1.05);
+            }
+        }
+
+        .aloe-frame::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: 
+                conic-gradient(from 0deg at 50% 50%,
+                    transparent 0deg,
+                    rgba(52, 211, 153, 0.03) 60deg,
+                    transparent 120deg,
+                    rgba(16, 185, 129, 0.02) 180deg,
+                    transparent 240deg,
+                    rgba(52, 211, 153, 0.03) 300deg,
+                    transparent 360deg
+                );
+            animation: aloeRotate 30s linear infinite;
+        }
+
+        @keyframes aloeRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Frame 2: Mint Clean - ミント系 */
+        .mint-frame {
+            border: 2px solid rgba(6, 182, 212, 0.15);
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.98) 0%, 
+                    rgba(236, 254, 255, 0.95) 100%
+                );
+        }
+
+        .mint-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg, 
+                    rgba(6, 182, 212, 0.06),
+                    rgba(34, 211, 238, 0.04),
+                    rgba(103, 232, 249, 0.02)
+                );
+            animation: mintWave 12s ease-in-out infinite;
+        }
+
+        @keyframes mintWave {
+            0%, 100% { transform: translateX(0) translateY(0); }
+            25% { transform: translateX(10px) translateY(-5px); }
+            75% { transform: translateX(-5px) translateY(10px); }
+        }
+
+        .mint-frame::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 100px;
+            background: 
+                linear-gradient(to top,
+                    rgba(6, 182, 212, 0.08),
+                    transparent
+                );
+            animation: mintTide 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes mintTide {
+            0% { transform: scaleY(0.8); }
+            100% { transform: scaleY(1.2); }
+        }
+
+        /* Frame 3: Sage Minimal - セージ系 */
+        .sage-frame {
+            border: 2px solid rgba(120, 113, 108, 0.12);
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.98) 0%, 
+                    rgba(250, 250, 249, 0.95) 100%
+                );
+        }
+
+        .sage-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                repeating-linear-gradient(
+                    45deg,
+                    rgba(168, 162, 158, 0.02) 0px,
+                    rgba(168, 162, 158, 0.02) 1px,
+                    transparent 1px,
+                    transparent 20px
+                );
+            animation: sageLines 25s linear infinite;
+        }
+
+        @keyframes sageLines {
+            0% { transform: translateX(0) translateY(0); }
+            100% { transform: translateX(20px) translateY(20px); }
+        }
+
+        .sage-frame::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: 
+                radial-gradient(circle, rgba(120, 113, 108, 0.1), transparent 70%);
+            border-radius: 50%;
+            animation: sageDot 6s ease-in-out infinite alternate;
+        }
+
+        @keyframes sageDot {
+            0% { transform: scale(0.8); opacity: 0.3; }
+            100% { transform: scale(1.2); opacity: 0.8; }
+        }
+
+        /* Frame 4: Lavender Soft - ラベンダー系 */
+        .lavender-frame {
+            border: 2px solid rgba(196, 181, 253, 0.15);
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.98) 0%, 
+                    rgba(250, 245, 255, 0.95) 100%
+                );
+        }
+
+        .lavender-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(ellipse at center, 
+                    rgba(196, 181, 253, 0.08) 0%,
+                    rgba(221, 214, 254, 0.04) 50%,
+                    transparent 100%
+                );
+            animation: lavenderGlow 10s ease-in-out infinite alternate;
+        }
+
+        @keyframes lavenderGlow {
+            0% { transform: scale(0.95); opacity: 0.6; }
+            100% { transform: scale(1.05); opacity: 1; }
+        }
+
+        .lavender-frame::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: 
+                linear-gradient(90deg,
+                    transparent,
+                    rgba(196, 181, 253, 0.4),
+                    transparent
+                );
+            animation: lavenderScan 5s linear infinite;
+        }
+
+        @keyframes lavenderScan {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Frame 5: Rose Gold - ローズゴールド系 */
+        .rose-frame {
+            border: 2px solid rgba(251, 207, 232, 0.15);
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.98) 0%, 
+                    rgba(254, 242, 242, 0.95) 100%
+                );
+        }
+
+        .rose-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg,
+                    rgba(251, 207, 232, 0.06),
+                    rgba(252, 165, 165, 0.04),
+                    rgba(254, 215, 170, 0.02)
+                );
+            animation: roseShimmer 14s ease-in-out infinite;
+        }
+
+        @keyframes roseShimmer {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        .rose-frame::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            top: 0;
+            background: 
+                repeating-conic-gradient(from 0deg at 20% 20%,
+                    transparent 0deg,
+                    rgba(251, 207, 232, 0.02) 5deg,
+                    transparent 10deg
+                );
+            animation: roseSpiral 40s linear infinite;
+        }
+
+        @keyframes roseSpiral {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .frame-title {
+            font-size: 1.8em;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .aloe-frame .frame-title {
+            color: #059669;
+        }
+
+        .mint-frame .frame-title {
+            color: #0891b2;
+        }
+
+        .sage-frame .frame-title {
+            color: #78716c;
+        }
+
+        .lavender-frame .frame-title {
+            color: #8b5cf6;
+        }
+
+        .rose-frame .frame-title {
+            color: #ec4899;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 25px;
+            z-index: 5;
+        }
+
+        .chart-canvas {
+            border-radius: 15px;
+        }
+
+        .frame-features {
+            position: relative;
+            z-index: 10;
+        }
+
+        .features-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .features-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+            list-style: none;
+        }
+
+        .feature-tag {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            cursor: default;
+        }
+
+        .aloe-frame .feature-tag {
+            background: rgba(52, 211, 153, 0.1);
+            color: #059669;
+            border: 1px solid rgba(52, 211, 153, 0.2);
+        }
+
+        .aloe-frame .feature-tag:hover {
+            background: rgba(52, 211, 153, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 211, 153, 0.2);
+        }
+
+        .mint-frame .feature-tag {
+            background: rgba(6, 182, 212, 0.1);
+            color: #0891b2;
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .mint-frame .feature-tag:hover {
+            background: rgba(6, 182, 212, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(6, 182, 212, 0.2);
+        }
+
+        .sage-frame .feature-tag {
+            background: rgba(120, 113, 108, 0.1);
+            color: #78716c;
+            border: 1px solid rgba(120, 113, 108, 0.2);
+        }
+
+        .sage-frame .feature-tag:hover {
+            background: rgba(120, 113, 108, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(120, 113, 108, 0.2);
+        }
+
+        .lavender-frame .feature-tag {
+            background: rgba(196, 181, 253, 0.1);
+            color: #8b5cf6;
+            border: 1px solid rgba(196, 181, 253, 0.2);
+        }
+
+        .lavender-frame .feature-tag:hover {
+            background: rgba(196, 181, 253, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(196, 181, 253, 0.2);
+        }
+
+        .rose-frame .feature-tag {
+            background: rgba(251, 207, 232, 0.1);
+            color: #ec4899;
+            border: 1px solid rgba(251, 207, 232, 0.2);
+        }
+
+        .rose-frame .feature-tag:hover {
+            background: rgba(251, 207, 232, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(251, 207, 232, 0.2);
+        }
+
+        /* フローティング要素 */
+        .floating-leaf {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: linear-gradient(45deg, #34d399, #10b981);
+            border-radius: 0 100% 0 100%;
+            animation: leafFloat 20s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-bubble {
+            position: absolute;
+            border-radius: 50%;
+            animation: bubbleFloat 15s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .mint-bubble {
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.3), rgba(6, 182, 212, 0.1));
+            width: 8px;
+            height: 8px;
+        }
+
+        .sage-dot {
+            background: rgba(120, 113, 108, 0.4);
+            width: 4px;
+            height: 4px;
+        }
+
+        .lavender-sparkle {
+            background: rgba(196, 181, 253, 0.6);
+            width: 6px;
+            height: 6px;
+            clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+        }
+
+        .rose-petal {
+            background: linear-gradient(45deg, rgba(251, 207, 232, 0.5), rgba(252, 165, 165, 0.3));
+            width: 10px;
+            height: 10px;
+            border-radius: 50% 0 50% 0;
+        }
+
+        @keyframes leafFloat {
+            0% { 
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { 
+                transform: translateY(-100px) translateX(50px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes bubbleFloat {
+            0% { 
+                transform: translateY(100vh) translateX(0) scale(0.5);
+                opacity: 0;
+            }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { 
+                transform: translateY(-100px) translateX(30px) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+                gap: 30px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.5em;
+            }
+
+            .chart-frame {
+                padding: 25px;
+                min-height: 400px;
+            }
+
+            .chart-container {
+                height: 250px;
+            }
+
+            .features-list {
+                grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌿 Clean White Chart Designs</h1>
+            <div class="subtitle">Fresh & Elegant Data Visualization</div>
+        </div>
+
+        <div class="charts-grid">
+            <!-- Frame 1: Aloe Fresh -->
+            <div class="chart-frame aloe-frame">
+                <div class="frame-title">🌱 Aloe Fresh</div>
+                <div class="chart-container">
+                    <canvas id="aloeChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="frame-features">
+                    <div class="features-title">Features</div>
+                    <ul class="features-list">
+                        <li class="feature-tag">Organic Flow</li>
+                        <li class="feature-tag">Clean Lines</li>
+                        <li class="feature-tag">Green Accent</li>
+                        <li class="feature-tag">Smooth Curves</li>
+                        <li class="feature-tag">Fresh Gradient</li>
+                        <li class="feature-tag">Zen Aesthetics</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Frame 2: Mint Clean -->
+            <div class="chart-frame mint-frame">
+                <div class="frame-title">🌊 Mint Clean</div>
+                <div class="chart-container">
+                    <canvas id="mintChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="frame-features">
+                    <div class="features-title">Features</div>
+                    <ul class="features-list">
+                        <li class="feature-tag">Wave Motion</li>
+                        <li class="feature-tag">Cool Tones</li>
+                        <li class="feature-tag">Tide Effect</li>
+                        <li class="feature-tag">Crystal Clear</li>
+                        <li class="feature-tag">Ocean Vibes</li>
+                        <li class="feature-tag">Refreshing</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Frame 3: Sage Minimal -->
+            <div class="chart-frame sage-frame">
+                <div class="frame-title">🍃 Sage Minimal</div>
+                <div class="chart-container">
+                    <canvas id="sageChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="frame-features">
+                    <div class="features-title">Features</div>
+                    <ul class="features-list">
+                        <li class="feature-tag">Minimalist</li>
+                        <li class="feature-tag">Geometric</li>
+                        <li class="feature-tag">Subtle Lines</li>
+                        <li class="feature-tag">Earth Tones</li>
+                        <li class="feature-tag">Zen Focus</li>
+                        <li class="feature-tag">Clean Space</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Frame 4: Lavender Soft -->
+            <div class="chart-frame lavender-frame">
+                <div class="frame-title">💜 Lavender Soft</div>
+                <div class="chart-container">
+                    <canvas id="lavenderChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="frame-features">
+                    <div class="features-title">Features</div>
+                    <ul class="features-list">
+                        <li class="feature-tag">Soft Glow</li>
+                        <li class="feature-tag">Purple Tint</li>
+                        <li class="feature-tag">Scan Lines</li>
+                        <li class="feature-tag">Dreamy Feel</li>
+                        <li class="feature-tag">Elegant</li>
+                        <li class="feature-tag">Ethereal</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Frame 5: Rose Gold -->
+            <div class="chart-frame rose-frame">
+                <div class="frame-title">🌸 Rose Gold</div>
+                <div class="chart-container">
+                    <canvas id="roseChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="frame-features">
+                    <div class="features-title">Features</div>
+                    <ul class="features-list">
+                        <li class="feature-tag">Warm Tones</li>
+                        <li class="feature-tag">Gold Accents</li>
+                        <li class="feature-tag">Spiral Motion</li>
+                        <li class="feature-tag">Luxury Feel</li>
+                        <li class="feature-tag">Romantic</li>
+                        <li class="feature-tag">Premium</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // サンプルデータ生成
+        function generateSampleData(style) {
+            const data = [];
+            const labels = [];
+            const baseValue = 100;
+            
+            for (let i = 0; i < 20; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - (19 - i));
+                labels.push(date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }));
+                
+                // スタイルに応じた異なる変動パターン
+                let wave, trend, noise;
+                
+                switch(style) {
+                    case 'aloe':
+                        wave = Math.sin(i * 0.4) * 8;
+                        trend = i * 0.5;
+                        noise = (Math.random() - 0.5) * 4;
+                        break;
+                    case 'mint':
+                        wave = Math.cos(i * 0.3) * 12;
+                        trend = Math.sin(i * 0.1) * 10;
+                        noise = (Math.random() - 0.5) * 6;
+                        break;
+                    case 'sage':
+                        wave = Math.sin(i * 0.2) * 6;
+                        trend = i * 0.3;
+                        noise = (Math.random() - 0.5) * 3;
+                        break;
+                    case 'lavender':
+                        wave = Math.sin(i * 0.5) * 10;
+                        trend = Math.cos(i * 0.2) * 8;
+                        noise = (Math.random() - 0.5) * 5;
+                        break;
+                    case 'rose':
+                        wave = Math.sin(i * 0.35) * 9;
+                        trend = i * 0.4;
+                        noise = (Math.random() - 0.5) * 4;
+                        break;
+                }
+                
+                data.push(baseValue + wave + trend + noise);
+            }
+            
+            return { labels, data };
+        }
+
+        // チャート作成関数
+        function createChart(canvasId, style) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const chartData = generateSampleData(style);
+            
+            const colorMap = {
+                aloe: { main: '#10b981', bg: 'rgba(16, 185, 129, 0.1)', grid: 'rgba(16, 185, 129, 0.2)' },
+                mint: { main: '#0891b2', bg: 'rgba(8, 145, 178, 0.1)', grid: 'rgba(8, 145, 178, 0.2)' },
+                sage: { main: '#78716c', bg: 'rgba(120, 113, 108, 0.1)', grid: 'rgba(120, 113, 108, 0.2)' },
+                lavender: { main: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.1)', grid: 'rgba(139, 92, 246, 0.2)' },
+                rose: { main: '#ec4899', bg: 'rgba(236, 72, 153, 0.1)', grid: 'rgba(236, 72, 153, 0.2)' }
+            };
+            
+            const colors = colorMap[style];
+            
+            // グラデーション作成
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, colors.bg);
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0)');
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: style.charAt(0).toUpperCase() + style.slice(1),
+                        data: chartData.data,
+                        borderColor: colors.main,
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.6,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: colors.main,
+                        pointBorderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverBackgroundColor: colors.main,
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: {
+                                color: colors.grid,
+                                drawBorder: false,
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: colors.main,
+                                font: { size: 10, weight: '500' }
+                            }
+                        },
+                        y: {
+                            display: true,
+                            grid: {
+                                color: colors.grid,
+                                drawBorder: false,
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: colors.main,
+                                font: { size: 10, weight: '500' }
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    animation: {
+                        duration: 2000,
+                        easing: 'easeInOutSine'
+                    }
+                }
+            });
+        }
+
+        // フローティング要素生成
+        function createFloatingElements() {
+            // Aloe 葉っぱ
+            for (let i = 0; i < 2; i++) {
+                setTimeout(() => {
+                    const leaf = document.createElement('div');
+                    leaf.className = 'floating-leaf';
+                    leaf.style.left = Math.random() * 20 + '%';
+                    leaf.style.animationDelay = Math.random() * 20 + 's';
+                    document.querySelector('.aloe-frame').appendChild(leaf);
+
+                    setTimeout(() => leaf.remove(), 20000);
+                }, i * 4000);
+            }
+
+            // Mint バブル
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'floating-bubble mint-bubble';
+                    bubble.style.left = Math.random() * 20 + 20 + '%';
+                    bubble.style.animationDelay = Math.random() * 15 + 's';
+                    document.querySelector('.mint-frame').appendChild(bubble);
+
+                    setTimeout(() => bubble.remove(), 15000);
+                }, i * 3000);
+            }
+
+            // Sage ドット
+            for (let i = 0; i < 4; i++) {
+                setTimeout(() => {
+                    const dot = document.createElement('div');
+                    dot.className = 'floating-bubble sage-dot';
+                    dot.style.left = Math.random() * 20 + 40 + '%';
+                    dot.style.animationDelay = Math.random() * 15 + 's';
+                    document.querySelector('.sage-frame').appendChild(dot);
+
+                    setTimeout(() => dot.remove(), 15000);
+                }, i * 2500);
+            }
+
+            // Lavender スパークル
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    const sparkle = document.createElement('div');
+                    sparkle.className = 'floating-bubble lavender-sparkle';
+                    sparkle.style.left = Math.random() * 20 + 60 + '%';
+                    sparkle.style.animationDelay = Math.random() * 15 + 's';
+                    document.querySelector('.lavender-frame').appendChild(sparkle);
+
+                    setTimeout(() => sparkle.remove(), 15000);
+                }, i * 3500);
+            }
+
+            // Rose 花びら
+            for (let i = 0; i < 2; i++) {
+                setTimeout(() => {
+                    const petal = document.createElement('div');
+                    petal.className = 'floating-bubble rose-petal';
+                    petal.style.left = Math.random() * 20 + 80 + '%';
+                    petal.style.animationDelay = Math.random() * 15 + 's';
+                    document.querySelector('.rose-frame').appendChild(petal);
+
+                    setTimeout(() => petal.remove(), 15000);
+                }, i * 4500);
+            }
+        }
+
+        // 3Dホバー効果
+        function init3DHoverEffects() {
+            document.querySelectorAll('.chart-frame').forEach(frame => {
+                frame.addEventListener('mousemove', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const centerX = rect.width / 2;
+                    const centerY = rect.height / 2;
+                    
+                    const rotateX = (y - centerY) / 30;
+                    const rotateY = (centerX - x) / 30;
+                    
+                    this.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px)`;
+                });
+                
+                frame.addEventListener('mouseleave', function() {
+                    this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+                });
+            });
+        }
+
+        // チャート更新アニメーション
+        function animateChartUpdate(chart) {
+            chart.data.datasets[0].data = chart.data.datasets[0].data.map(value => 
+                value + (Math.random() - 0.5) * 10
+            );
+            chart.update('active');
+        }
+
+        // 初期化
+        document.addEventListener('DOMContentLoaded', function() {
+            // チャート作成
+            const aloeChart = createChart('aloeChart', 'aloe');
+            const mintChart = createChart('mintChart', 'mint');
+            const sageChart = createChart('sageChart', 'sage');
+            const lavenderChart = createChart('lavenderChart', 'lavender');
+            const roseChart = createChart('roseChart', 'rose');
+
+            // 3Dホバー効果とフローティング要素
+            setTimeout(() => {
+                init3DHoverEffects();
+                createFloatingElements();
+                setInterval(createFloatingElements, 12000);
+            }, 1000);
+
+            // 定期的なチャート更新（デモ用）
+            const charts = [aloeChart, mintChart, sageChart, lavenderChart, roseChart];
+            setInterval(() => {
+                if (Math.random() > 0.7) {
+                    const randomChart = charts[Math.floor(Math.random() * charts.length)];
+                    animateChartUpdate(randomChart);
+                }
+            }, 8000);
+
+            // コンソールメッセージ
+            console.log(`
+            🌿 CLEAN WHITE CHART DESIGNS 🌿
+            
+            🌱 Aloe Fresh: Organic & Clean
+            🌊 Mint Clean: Cool & Refreshing
+            🍃 Sage Minimal: Earth & Zen
+            💜 Lavender Soft: Dreamy & Elegant
+            🌸 Rose Gold: Warm & Premium
+            
+            ✨ Perfect for modern dashboards! ✨
+            `);
+        });
+
+        // パフォーマンス最適化
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '50px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animationPlayState = 'running';
+                } else {
+                    entry.target.style.animationPlayState = 'paused';
+                }
+            });
+        }, observerOptions);
+
+        // 各フレームを監視
+        document.querySelectorAll('.chart-frame').forEach(frame => {
+            observer.observe(frame);
+        });
+
+        // ダークモード切り替え対応
+        if (window.matchMedia) {
+            const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+            mediaQuery.addListener(() => {
+                // ダークモード時は少し暗めに調整
+                if (mediaQuery.matches) {
+                    document.body.style.filter = 'brightness(0.95)';
+                } else {
+                    document.body.style.filter = 'brightness(1)';
+                }
+            });
+        }
+    </script>
+</body>
+</html>Radius: 8,
+                        pointHover
