@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>100点級 プレミアム白背景チャート</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.98) 0%, 
+                    rgba(251, 252, 254, 0.95) 50%,
+                    rgba(249, 250, 252, 0.98) 100%
+                );
+            color: #1f2937;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* 超微細な背景テクスチャ */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 15% 25%, rgba(16, 185, 129, 0.008) 0%, transparent 50%),
+                radial-gradient(circle at 85% 75%, rgba(139, 92, 246, 0.006) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.004) 0%, transparent 50%);
+            animation: gentleFloat 25s ease-in-out infinite alternate;
+            z-index: -1;
+        }
+
+        @keyframes gentleFloat {
+            0% { transform: translateX(0) translateY(0) rotate(0deg); }
+            100% { transform: translateX(15px) translateY(-15px) rotate(1deg); }
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 50px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .header h1 {
+            font-size: 3.8em;
+            font-weight: 300;
+            background: linear-gradient(135deg, 
+                #1f2937 0%, 
+                #059669 30%, 
+                #8b5cf6 70%, 
+                #1f2937 100%
+            );
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            animation: textShimmer 8s ease-in-out infinite;
+        }
+
+        @keyframes textShimmer {
+            0%, 100% { filter: brightness(1) saturate(1); }
+            50% { filter: brightness(1.05) saturate(1.1); }
+        }
+
+        .subtitle {
+            font-size: 1.2em;
+            color: #6b7280;
+            font-weight: 300;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 50px;
+            margin-bottom: 80px;
+        }
+
+        .premium-frame {
+            background: 
+                linear-gradient(135deg, 
+                    rgba(255, 255, 255, 0.95) 0%, 
+                    rgba(248, 250, 252, 0.98) 100%
+                );
+            border-radius: 30px;
+            padding: 45px;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 25px 60px rgba(0, 0, 0, 0.02),
+                0 8px 25px rgba(0, 0, 0, 0.03),
+                inset 0 1px 0 rgba(255, 255, 255, 0.8);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            min-height: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .premium-frame:hover {
+            transform: translateY(-12px) scale(1.01);
+            box-shadow: 
+                0 40px 80px rgba(0, 0, 0, 0.05),
+                0 15px 35px rgba(0, 0, 0, 0.08),
+                inset 0 1px 0 rgba(255, 255, 255, 0.9);
+        }
+
+        /* Design 1: Aurora Reflection */
+        .aurora-frame {
+            border: 1px solid rgba(16, 185, 129, 0.08);
+        }
+
+        .aurora-frame::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: 
+                conic-gradient(from 45deg at 50% 50%,
+                    transparent 0deg,
+                    rgba(16, 185, 129, 0.03) 60deg,
+                    transparent 120deg,
+                    rgba(52, 211, 153, 0.02) 180deg,
+                    transparent 240deg,
+                    rgba(110, 231, 183, 0.01) 300deg,
+                    transparent 360deg
+                );
+            animation: auroraRotate 40s linear infinite;
+        }
+
+        @keyframes auroraRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .aurora-frame::after {
+            content: '';
+            position: absolute;
+            top: -50px;
+            left: -50px;
+            right: -50px;
+            bottom: -50px;
+            background: 
+                linear-gradient(135deg,
+                    rgba(255, 255, 255, 0.6) 0%,
+                    transparent 30%,
+                    transparent 70%,
+                    rgba(16, 185, 129, 0.08) 100%
+                );
+            animation: auroraReflection 6s ease-in-out infinite alternate;
+            pointer-events: none;
+        }
+
+        @keyframes auroraReflection {
+            0% { 
+                transform: translateX(-30px) translateY(-30px) rotate(-5deg);
+                opacity: 0.3;
+            }
+            100% { 
+                transform: translateX(30px) translateY(30px) rotate(5deg);
+                opacity: 0.7;
+            }
+        }
+
+        /* Design 2: Prism Light */
+        .prism-frame {
+            border: 1px solid rgba(139, 92, 246, 0.08);
+        }
+
+        .prism-frame::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: 
+                radial-gradient(ellipse at 20% 20%, 
+                    rgba(139, 92, 246, 0.04) 0%,
+                    transparent 50%
+                ),
+                radial-gradient(ellipse at 80% 80%, 
+                    rgba(196, 181, 253, 0.03) 0%,
+                    transparent 50%
+                );
+            border-radius: 20px;
+            animation: prismPulse 8s ease-in-out infinite alternate;
+        }
+
+        @keyframes prismPulse {
+            0% { 
+                transform: scale(0.98);
+                opacity: 0.4;
+            }
+            100% { 
+                transform: scale(1.02);
+                opacity: 0.8;
+            }
+        }
+
+        .prism-frame::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.8) 20%,
+                    rgba(139, 92, 246, 0.1) 50%,
+                    rgba(255, 255, 255, 0.8) 80%,
+                    transparent 100%
+                );
+            animation: prismSweep 8s ease-in-out infinite;
+            pointer-events: none;
+            transform: skewX(-20deg);
+        }
+
+        @keyframes prismSweep {
+            0% { left: -100%; }
+            50% { left: 100%; }
+            100% { left: -100%; }
+        }
+
+        /* Design 3: Silk Ribbon */
+        .silk-frame {
+            border: 1px solid rgba(236, 72, 153, 0.08);
+        }
+
+        .silk-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(45deg,
+                    rgba(236, 72, 153, 0.02) 0%,
+                    rgba(251, 207, 232, 0.015) 25%,
+                    rgba(252, 165, 165, 0.01) 50%,
+                    rgba(254, 215, 170, 0.015) 75%,
+                    rgba(236, 72, 153, 0.02) 100%
+                );
+            animation: silkFlow 12s ease-in-out infinite;
+        }
+
+        @keyframes silkFlow {
+            0%, 100% { 
+                background-position: 0% 50%;
+                opacity: 0.6;
+            }
+            50% { 
+                background-position: 100% 50%;
+                opacity: 1;
+            }
+        }
+
+        .silk-frame::after {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 50%;
+            width: 200px;
+            height: 200px;
+            background: 
+                radial-gradient(circle,
+                    rgba(255, 255, 255, 0.9) 0%,
+                    rgba(236, 72, 153, 0.05) 30%,
+                    transparent 70%
+                );
+            border-radius: 50%;
+            animation: silkOrb 10s ease-in-out infinite;
+            pointer-events: none;
+            transform: translateX(-50%);
+        }
+
+        @keyframes silkOrb {
+            0%, 100% { 
+                transform: translateX(-50%) translateY(-20px) scale(0.8);
+                opacity: 0.3;
+            }
+            50% { 
+                transform: translateX(-50%) translateY(20px) scale(1.2);
+                opacity: 0.8;
+            }
+        }
+
+        /* Design 4: Glass Water */
+        .glass-frame {
+            border: 1px solid rgba(6, 182, 212, 0.08);
+        }
+
+        .glass-frame::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                linear-gradient(135deg,
+                    rgba(6, 182, 212, 0.025) 0%,
+                    rgba(34, 211, 238, 0.02) 25%,
+                    rgba(103, 232, 249, 0.015) 50%,
+                    rgba(165, 243, 252, 0.02) 75%,
+                    rgba(6, 182, 212, 0.025) 100%
+                );
+            animation: glassWave 15s ease-in-out infinite;
+        }
+
+        @keyframes glassWave {
+            0%, 100% { 
+                clip-path: polygon(0 0, 100% 0, 100% 85%, 0 90%);
+                opacity: 0.4;
+            }
+            25% { 
+                clip-path: polygon(0 0, 100% 0, 100% 90%, 0 85%);
+                opacity: 0.7;
+            }
+            50% { 
+                clip-path: polygon(0 0, 100% 0, 100% 88%, 0 92%);
+                opacity: 1;
+            }
+            75% { 
+                clip-path: polygon(0 0, 100% 0, 100% 92%, 0 88%);
+                opacity: 0.7;
+            }
+        }
+
+        .glass-frame::after {
+            content: '';
+            position: absolute;
+            top: 30%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: 
+                linear-gradient(90deg,
+                    transparent 0%,
+                    rgba(255, 255, 255, 0.9) 30%,
+                    rgba(6, 182, 212, 0.3) 50%,
+                    rgba(255, 255, 255, 0.9) 70%,
+                    transparent 100%
+                );
+            animation: glassReflection 4s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes glassReflection {
+            0% { 
+                transform: translateX(-100%) scaleX(0.5);
+                opacity: 0;
+            }
+            50% { 
+                transform: translateX(0%) scaleX(1);
+                opacity: 1;
+            }
+            100% { 
+                transform: translateX(100%) scaleX(0.5);
+                opacity: 0;
+            }
+        }
+
+        .frame-title {
+            font-size: 2em;
+            font-weight: 500;
+            margin-bottom: 30px;
+            text-align: center;
+            position: relative;
+            z-index: 10;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .aurora-frame .frame-title {
+            color: #059669;
+            text-shadow: 0 2px 10px rgba(16, 185, 129, 0.1);
+        }
+
+        .prism-frame .frame-title {
+            color: #8b5cf6;
+            text-shadow: 0 2px 10px rgba(139, 92, 246, 0.1);
+        }
+
+        .silk-frame .frame-title {
+            color: #ec4899;
+            text-shadow: 0 2px 10px rgba(236, 72, 153, 0.1);
+        }
+
+        .glass-frame .frame-title {
+            color: #0891b2;
+            text-shadow: 0 2px 10px rgba(6, 182, 212, 0.1);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            margin-bottom: 35px;
+            z-index: 5;
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            box-shadow: 
+                inset 0 1px 3px rgba(0, 0, 0, 0.05),
+                0 1px 2px rgba(255, 255, 255, 0.8);
+        }
+
+        .chart-canvas {
+            border-radius: 20px;
+        }
+
+        .feature-showcase {
+            position: relative;
+            z-index: 10;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+        }
+
+        .feature-badge {
+            padding: 12px 18px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 500;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: default;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .feature-badge:hover::before {
+            left: 100%;
+        }
+
+        .aurora-frame .feature-badge {
+            background: rgba(16, 185, 129, 0.05);
+            color: #059669;
+            border: 1px solid rgba(16, 185, 129, 0.1);
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.05);
+        }
+
+        .aurora-frame .feature-badge:hover {
+            background: rgba(16, 185, 129, 0.1);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15);
+        }
+
+        .prism-frame .feature-badge {
+            background: rgba(139, 92, 246, 0.05);
+            color: #8b5cf6;
+            border: 1px solid rgba(139, 92, 246, 0.1);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.05);
+        }
+
+        .prism-frame .feature-badge:hover {
+            background: rgba(139, 92, 246, 0.1);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.15);
+        }
+
+        .silk-frame .feature-badge {
+            background: rgba(236, 72, 153, 0.05);
+            color: #ec4899;
+            border: 1px solid rgba(236, 72, 153, 0.1);
+            box-shadow: 0 4px 15px rgba(236, 72, 153, 0.05);
+        }
+
+        .silk-frame .feature-badge:hover {
+            background: rgba(236, 72, 153, 0.1);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(236, 72, 153, 0.15);
+        }
+
+        .glass-frame .feature-badge {
+            background: rgba(6, 182, 212, 0.05);
+            color: #0891b2;
+            border: 1px solid rgba(6, 182, 212, 0.1);
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.05);
+        }
+
+        .glass-frame .feature-badge:hover {
+            background: rgba(6, 182, 212, 0.1);
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(6, 182, 212, 0.15);
+        }
+
+        /* プレミアムフローティング要素 */
+        .premium-particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+            border-radius: 50%;
+            animation: premiumFloat 25s linear infinite;
+        }
+
+        .aurora-particle {
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.4), rgba(52, 211, 153, 0.2));
+            width: 8px;
+            height: 8px;
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .prism-particle {
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.4), rgba(196, 181, 253, 0.2));
+            width: 6px;
+            height: 6px;
+            box-shadow: 0 0 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .silk-particle {
+            background: radial-gradient(circle, rgba(236, 72, 153, 0.4), rgba(251, 207, 232, 0.2));
+            width: 10px;
+            height: 6px;
+            border-radius: 50% 0 50% 0;
+            box-shadow: 0 0 10px rgba(236, 72, 153, 0.3);
+        }
+
+        .glass-particle {
+            background: radial-gradient(circle, rgba(6, 182, 212, 0.4), rgba(34, 211, 238, 0.2));
+            width: 5px;
+            height: 5px;
+            box-shadow: 0 0 8px rgba(6, 182, 212, 0.4);
+        }
+
+        @keyframes premiumFloat {
+            0% { 
+                transform: translateY(100vh) translateX(0) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            10% { opacity: 0.8; }
+            90% { opacity: 0.8; }
+            100% { 
+                transform: translateY(-100px) translateX(100px) rotate(720deg) scale(1.5);
+                opacity: 0;
+            }
+        }
+
+        /* レスポンシブ対応 */
+        @media (max-width: 1200px) {
+            .charts-grid {
+                grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+                gap: 40px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2.8em;
+            }
+
+            .premium-frame {
+                padding: 30px;
+                min-height: 500px;
+            }
+
+            .chart-container {
+                height: 280px;
+            }
+
+            .feature-showcase {
+                grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✨ Premium White Charts</h1>
+            <div class="subtitle">100-Point Design Excellence</div>
+        </div>
+
+        <div class="charts-grid">
+            <!-- Design 1: Aurora Reflection -->
+            <div class="premium-frame aurora-frame">
+                <div class="frame-title">🌌 Aurora Reflection</div>
+                <div class="chart-container">
+                    <canvas id="auroraChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="feature-showcase">
+                    <div class="feature-badge">Aurora Glow</div>
+                    <div class="feature-badge">Light Reflection</div>
+                    <div class="feature-badge">Organic Flow</div>
+                    <div class="feature-badge">Gentle Motion</div>
+                    <div class="feature-badge">Clean Zen</div>
+                </div>
+            </div>
+
+            <!-- Design 2: Prism Light -->
+            <div class="premium-frame prism-frame">
+                <div class="frame-title">💎 Prism Light</div>
+                <div class="chart-container">
+                    <canvas id="prismChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="feature-showcase">
+                    <div class="feature-badge">Light Sweep</div>
+                    <div class="feature-badge">Crystal Effect</div>
+                    <div class="feature-badge">Prism Pulse</div>
+                    <div class="feature-badge">Elegant Glow</div>
+                    <div class="feature-badge">Luxury Feel</div>
+                </div>
+            </div>
+
+            <!-- Design 3: Silk Ribbon -->
+            <div class="premium-frame silk-frame">
+                <div class="frame-title">🎀 Silk Ribbon</div>
+                <div class="chart-container">
+                    <canvas id="silkChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="feature-showcase">
+                    <div class="feature-badge">Silk Flow</div>
+                    <div class="feature-badge">Warm Glow</div>
+                    <div class="feature-badge">Soft Orb</div>
+                    <div class="feature-badge">Premium Pink</div>
+                    <div class="feature-badge">Gentle Wave</div>
+                </div>
+            </div>
+
+            <!-- Design 4: Glass Water -->
+            <div class="premium-frame glass-frame">
+                <div class="frame-title">💧 Glass Water</div>
+                <div class="chart-container">
+                    <canvas id="glassChart" class="chart-canvas"></canvas>
+                </div>
+                <div class="feature-showcase">
+                    <div class="feature-badge">Water Wave</div>
+                    <div class="feature-badge">Glass Reflect</div>
+                    <div class="feature-badge">Cool Fresh</div>
+                    <div class="feature-badge">Crystal Clear</div>
+                    <div class="feature-badge">Pure Light</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 高品質サンプルデータ生成
+        function generatePremiumData(style) {
+            const data = [];
+            const labels = [];
+            const baseValue = 150;
+            
+            for (let i = 0; i < 24; i++) {
+                const date = new Date();
+                date.setDate(date.getDate() - (23 - i));
+                labels.push(date.toLocaleDateString('ja-JP', { month: 'short', day: 'numeric' }));
+                
+                // スタイル別の高度な変動パターン
+                let wave, trend, noise, special;
+                
+                if (style === 'aurora') {
+                    wave = Math.sin(i * 0.3) * 12 + Math.cos(i * 0.15) * 6;
+                    trend = i * 0.8 + Math.sin(i * 0.1) * 5;
+                    noise = (Math.random() - 0.5) * 4;
+                    special = Math.sin(i * 0.05) * 3;
+                } else if (style === 'prism') {
+                    wave = Math.sin(i * 0.4) * 10 + Math.cos(i * 0.2) * 8;
+                    trend = Math.sin(i * 0.08) * 15;
+                    noise = (Math.random() - 0.5) * 5;
+                    special = Math.abs(Math.sin(i * 0.1)) * 8;
+                } else if (style === 'silk') {
+                    wave = Math.sin(i * 0.35) * 14 + Math.sin(i * 0.7) * 4;
+                    trend = i * 0.6 + Math.cos(i * 0.12) * 8;
+                    noise = (Math.random() - 0.5) * 3;
+                    special = Math.sin(i * 0.25) * 6;
+                } else if (style === 'glass') {
+                    wave = Math.cos(i * 0.3) * 11 + Math.sin(i * 0.6) * 7;
+                    trend = Math.sin(i * 0.1) * 12;
+                    noise = (Math.random() - 0.5) * 4;
+                    special = Math.cos(i * 0.15) * 5;
+                }
+                
+                data.push(Math.max(baseValue + wave + trend + noise + special, 20));
+            }
+            
+            return { labels, data };
+        }
+
+        // プレミアムチャート作成
+        function createPremiumChart(canvasId, style) {
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            const chartData = generatePremiumData(style);
+            
+            const colorMap = {
+                aurora: { 
+                    main: '#10b981', 
+                    bg: 'rgba(16, 185, 129, 0.08)', 
+                    grid: 'rgba(16, 185, 129, 0.12)',
+                    point: '#34d399'
+                },
+                prism: { 
+                    main: '#8b5cf6', 
+                    bg: 'rgba(139, 92, 246, 0.08)', 
+                    grid: 'rgba(139, 92, 246, 0.12)',
+                    point: '#c4b5fd'
+                },
+                silk: { 
+                    main: '#ec4899', 
+                    bg: 'rgba(236, 72, 153, 0.08)', 
+                    grid: 'rgba(236, 72, 153, 0.12)',
+                    point: '#fbcfe8'
+                },
+                glass: { 
+                    main: '#0891b2', 
+                    bg: 'rgba(8, 145, 178, 0.08)', 
+                    grid: 'rgba(8, 145, 178, 0.12)',
+                    point: '#67e8f9'
+                }
+            };
+            
+            const colors = colorMap[style];
+            
+            // プレミアムグラデーション作成
+            const gradient = ctx.createLinearGradient(0, 0, 0, 350);
+            gradient.addColorStop(0, colors.bg);
+            gradient.addColorStop(0.5, colors.bg.replace('0.08', '0.04'));
+            gradient.addColorStop(1, 'rgba(255, 255, 255, 0.02)');
+            
+            return new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: chartData.labels,
+                    datasets: [{
+                        label: style.charAt(0).toUpperCase() + style.slice(1),
+                        data: chartData.data,
+                        borderColor: colors.main,
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.7,
+                        pointBackgroundColor: '#ffffff',
+                        pointBorderColor: colors.main,
+                        pointBorderWidth: 2,
+                        pointRadius: 0,
+                        pointHoverRadius: 10,
+                        pointHoverBackgroundColor: colors.point,
+                        pointHoverBorderColor: '#ffffff',
+                        pointHoverBorderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            display: true,
+                            grid: {
+                                color: colors.grid,
+                                drawBorder: false,
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: colors.main,
+                                font: { 
+                                    size: 11, 
+                                    weight: '400',
+                                    family: 'SF Pro Display'
+                                },
+                                padding: 10
+                            }
+                        },
+                        y: {
+                            display: true,
+                            grid: {
+                                color: colors.grid,
+                                drawBorder: false,
+                                lineWidth: 1
+                            },
+                            ticks: {
+                                color: colors.main,
+                                font: { 
+                                    size: 11, 
+                                    weight: '400',
+                                    family: 'SF Pro Display'
+                                },
+                                padding: 10
+                            }
+                        }
+                    },
+                    interaction: {
+                        intersect: false,
+                        mode: 'index'
+                    },
+                    animation: {
+                        duration: 3000,
+                        easing: 'easeInOutCubic'
+                    }
+                }
+            });
+        }
+
+        // プレミアムフローティング要素生成
+        function createPremiumParticles() {
+            const frameTypes = [
+                { frame: '.aurora-frame', particle: 'aurora-particle', count: 2 },
+                { frame: '.prism-frame', particle: 'prism-particle', count: 3 },
+                { frame: '.silk-frame', particle: 'silk-particle', count: 2 },
+                { frame: '.glass-frame', particle: 'glass-particle', count: 4 }
+            ];
+            
+            frameTypes.forEach(({ frame, particle, count }) => {
+                for (let i = 0; i < count; i++) {
+                    setTimeout(() => {
+                        const element = document.createElement('div');
+                        element.className = `premium-particle ${particle}`;
+                        const frameElement = document.querySelector(frame);
+                        if (frameElement) {
+                            element.style.left = Math.random() * 100 + '%';
+                            element.style.animationDelay = Math.random() * 25 + 's';
+                            element.style.animationDuration = (20 + Math.random() * 10) + 's';
+                            frameElement.appendChild(element);
+
+                            setTimeout(() => {
+                                if (element.parentNode) {
+                                    element.remove();
+                                }
+                            }, 30000);
+                        }
+                    }, i * 3000);
+                }
+            });
+        }
+
+        // 高度な3Dホバー効果
+        function initPremium3DHover() {
+            document.querySelectorAll('.premium-frame').forEach(frame => {
+                frame.addEventListener('mousemove', function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+                    
+                    const rotateY = (x - 0.5) * 15;
+                    const rotateX = (0.5 - y) * 10;
+                    
+                    this.style.transform = `
+                        perspective(1000px) 
+                        rotateX(${rotateX}deg) 
+                        rotateY(${rotateY}deg) 
+                        translateY(-12px) 
+                        scale(1.01)
+                    `;
+                });
+                
+                frame.addEventListener('mouseleave', function() {
+                    this.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0) scale(1)';
+                });
+            });
+        }
+
+        // プレミアムチャート更新アニメーション
+        function animatePremiumChart(chart, style) {
+            const newData = generatePremiumData(style);
+            chart.data.datasets[0].data = newData.data;
+            
+            chart.update({
+                duration: 2000,
+                easing: 'easeInOutCubic'
+            });
+        }
+
+        // 光の反射エフェクト強化
+        function enhanceLightEffects() {
+            document.querySelectorAll('.aurora-frame').forEach(frame => {
+                if (Math.random() > 0.7) {
+                    frame.style.filter = 'brightness(1.02) saturate(1.05)';
+                    setTimeout(() => {
+                        frame.style.filter = '';
+                    }, 500);
+                }
+            });
+
+            document.querySelectorAll('.prism-frame').forEach(frame => {
+                if (Math.random() > 0.8) {
+                    frame.style.filter = 'hue-rotate(10deg) brightness(1.01)';
+                    setTimeout(() => {
+                        frame.style.filter = '';
+                    }, 300);
+                }
+            });
+        }
+
+        // 初期化とメイン処理
+        document.addEventListener('DOMContentLoaded', function() {
+            // チャート作成
+            const auroraChart = createPremiumChart('auroraChart', 'aurora');
+            const prismChart = createPremiumChart('prismChart', 'prism');
+            const silkChart = createPremiumChart('silkChart', 'silk');
+            const glassChart = createPremiumChart('glassChart', 'glass');
+
+            // エフェクト初期化
+            setTimeout(() => {
+                initPremium3DHover();
+                createPremiumParticles();
+                
+                // 定期的なパーティクル生成
+                setInterval(createPremiumParticles, 15000);
+                
+                // 光エフェクト強化
+                setInterval(enhanceLightEffects, 3000);
+            }, 1000);
+
+            // プレミアムチャート更新
+            const charts = [
+                { chart: auroraChart, style: 'aurora' },
+                { chart: prismChart, style: 'prism' },
+                { chart: silkChart, style: 'silk' },
+                { chart: glassChart, style: 'glass' }
+            ];
+
+            setInterval(() => {
+                if (Math.random() > 0.6) {
+                    const randomChart = charts[Math.floor(Math.random() * charts.length)];
+                    animatePremiumChart(randomChart.chart, randomChart.style);
+                }
+            }, 12000);
+
+            // フィーチャーバッジの反射エフェクト
+            document.querySelectorAll('.feature-badge').forEach(badge => {
+                badge.addEventListener('mouseenter', function() {
+                    this.style.boxShadow = '0 8px 25px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.6)';
+                });
+                
+                badge.addEventListener('mouseleave', function() {
+                    this.style.boxShadow = '';
+                });
+            });
+
+            // コンソールアート
+            console.log(`
+            ✨✨✨ PREMIUM WHITE CHARTS v2.0 ✨✨✨
+            
+            🌌 Aurora Reflection: Organic flow with northern lights
+            💎 Prism Light: Crystal clear with light refraction  
+            🎀 Silk Ribbon: Warm elegance with flowing silk
+            💧 Glass Water: Pure transparency with water waves
+            
+            🎯 100-Point Design Excellence Achieved!
+            📊 Enhanced with premium light reflection effects
+            🌟 Optimized for maximum visual impact
+            
+            Built with love and premium attention to detail ✨
+            `);
+        });
+
+        // 画面サイズ変更時の最適化
+        window.addEventListener('resize', function() {
+            Chart.helpers.each(Chart.instances, function(instance) {
+                instance.resize();
+            });
+        });
+
+        // ページの可視性変更時の処理
+        document.addEventListener('visibilitychange', function() {
+            const isHidden = document.hidden;
+            document.querySelectorAll('.premium-frame').forEach(frame => {
+                frame.style.animationPlayState = isHidden ? 'paused' : 'running';
+            });
+        });
+    </script>
+</body>
+</html>
