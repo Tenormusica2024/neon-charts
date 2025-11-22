@@ -1,0 +1,41 @@
+/* Base Variables & Reset */
+:root {
+  --font-primary: 'Inter', sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-medium: 0.4s ease;
+}
+
+/* NEON THEME (Default) */
+body.theme-neon {
+  --bg-color: #050505;
+  --card-bg: rgba(20, 20, 20, 0.6);
+  --text-primary: #ffffff;
+  --text-secondary: #a0a0a0;
+  --accent-color: #00f3ff; /* Cyan */
+  --accent-secondary: #ff00ff; /* Magenta */
+  --border-color: rgba(0, 243, 255, 0.3);
+  --glow-shadow: 0 0 20px rgba(0, 243, 255, 0.15);
+  --font-display: 'Outfit', sans-serif;
+  --chart-up: #00ff9d;
+  --chart-down: #ff0055;
+  --grid-color: rgba(255, 255, 255, 0.05);
+}
+
+/* LUXURY THEME */
+body.theme-luxury {
+  --bg-color: #1a1a1a;
+  --card-bg: rgba(30, 30, 30, 0.8);
+  --text-primary: #e5e4e2; /* Platinum */
+  --text-secondary: #8c8c8c;
+  --accent-color: #d4af37; /* Champagne Gold */
+  --accent-secondary: #c0c0c0; /* Silver */
+  --border-color: rgba(212, 175, 55, 0.3);
+  --glow-shadow: 0 4px 30px rgba(0, 0, 0, 0.3); /* Subtle shadow, no neon glow */
+  --font-display: 'Cinzel', serif;
+  --chart-up: #d4af37;
+  --chart-down: #8c8c8c;
+  --grid-color: rgba(212, 175, 55, 0.05);
+}

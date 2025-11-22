@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Neon Charts | Professional Market Data</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Inter:wght@300;400;600;700&family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./src/css/main.css">
+    <link rel="stylesheet" href="./src/css/themes.css">
+  </head>
+  <body class="theme-neon">
+    <div class="app-container">
+      <header class="main-header">
+        <div class="logo-container">
+          <h1 class="app-title">NEON CHARTS</h1>
+          <span class="app-subtitle">Professional Market Intelligence</span>
+        </div>
+        <div class="theme-switch-container">
+          <button id="theme-toggle" class="theme-btn">
+            <span class="btn-text">Switch Theme</span>
+            <div class="toggle-icon"></div>
+          </button>
+        </div>
+      </header>
+
+      <main class="dashboard-grid">
+        <!-- S&P 500 Card -->
+        <article class="chart-card" id="card-sp500">
+          <div class="card-header">
+            <div class="asset-info">
+              <h2>S&P 500</h2>
+              <span class="ticker">^GSPC</span>
+            </div>
+            <div class="price-info">
+              <span class="current-price" id="price-sp500">Loading...</span>
+              <span class="price-change" id="change-sp500">--</span>
+            </div>
+          </div>
+          <div class="chart-container" id="chart-sp500"></div>
+        </article>
+
+        <!-- FANG+ Card -->
+        <article class="chart-card" id="card-fang">
+          <div class="card-header">
+            <div class="asset-info">
+              <h2>FANG+ Index</h2>
+              <span class="ticker">NYFANG</span>
+            </div>
+            <div class="price-info">
+              <span class="current-price" id="price-fang">Loading...</span>
+              <span class="price-change" id="change-fang">--</span>
+            </div>
+          </div>
+          <div class="chart-container" id="chart-fang"></div>
+        </article>
+
+        <!-- Bitcoin Card -->
+        <article class="chart-card" id="card-btc">
+          <div class="card-header">
+            <div class="asset-info">
+              <h2>Bitcoin</h2>
+              <span class="ticker">BTC/USD</span>
+            </div>
+            <div class="price-info">
+              <span class="current-price" id="price-btc">Loading...</span>
+              <span class="price-change" id="change-btc">--</span>
+            </div>
+          </div>
+          <div class="chart-container" id="chart-btc"></div>
+        </article>
+      </main>
+
+      <footer class="main-footer">
+        <p>Data provided by Yahoo Finance & CoinGecko. Real-time data may be delayed.</p>
+        <p>&copy; 2024 Neon Charts. Designed by Tenormusica.</p>
+      </footer>
+    </div>
+    <script type="module" src="./src/js/main.js"></script>
+  </body>
+</html>
