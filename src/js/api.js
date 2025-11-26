@@ -71,8 +71,16 @@ export async function fetchBitcoinData() {
     
     // エラー時は古いキャッシュを返す（可能なら）
     if (cache.bitcoin.data) {
-      console.warn('⚠️  Using stale Bitcoin data from cache');
-      return cache.bitcoin.data;
+      const ageMinutes = Math.floor((Date.now() - cache.bitcoin.timestamp) / 60000);
+      console.warn(`⚠️  Using stale Bitcoin data from cache (${ageMinutes} minutes old)`);
+      
+      // 古いデータであることをUIに通知するためのフラグを追加
+      return { 
+        ...cache.bitcoin.data, 
+        isStale: true, 
+        staleMinutes: ageMinutes,
+        staleWarning: `Data is ${ageMinutes} min old (API error)`
+      };
     }
     
     return { error: true, message: error.message };
