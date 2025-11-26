@@ -99,15 +99,16 @@ function updateCard(id, price, change, data) {
 
 // Main Data Loading
 async function loadData() {
-  try {
-    // 並列実行（3つ同時にリクエスト） - 3倍高速化
-    const [sp500Data, fangData, btcData] = await Promise.all([
-      fetchStockData('SPY'),
-      fetchStockData('FNGS'),
-      fetchBitcoinData()
-    ]);
+  // Promise.allSettled()で部分的失敗に対応
+  const results = await Promise.allSettled([
+    fetchStockData('SPY'),
+    fetchStockData('FNGS'),
+    fetchBitcoinData()
+  ]);
 
-    // 1. S&P 500 (Using SPY ETF as proxy)
+  // 1. S&P 500 (Using SPY ETF as proxy)
+  if (results[0].status === 'fulfilled') {
+    const sp500Data = results[0].value;
     if (sp500Data && !sp500Data.error) {
       updateCard('sp500', sp500Data.current, sp500Data.change, sp500Data.historical);
       const tickerEl = document.querySelector('#card-sp500 .ticker');
@@ -115,8 +116,14 @@ async function loadData() {
     } else {
       showError('sp500', sp500Data);
     }
+  } else {
+    console.error('❌ SPY fetch rejected:', results[0].reason);
+    showError('sp500', { error: true, message: results[0].reason.message || 'Network error' });
+  }
 
-    // 2. FANG+ (Using FNGS ETN as proxy)
+  // 2. FANG+ (Using FNGS ETN as proxy)
+  if (results[1].status === 'fulfilled') {
+    const fangData = results[1].value;
     if (fangData && !fangData.error) {
       updateCard('fang', fangData.current, fangData.change, fangData.historical);
       const tickerEl = document.querySelector('#card-fang .ticker');
@@ -124,26 +131,43 @@ async function loadData() {
     } else {
       showError('fang', fangData);
     }
+  } else {
+    console.error('❌ FNGS fetch rejected:', results[1].reason);
+    showError('fang', { error: true, message: results[1].reason.message || 'Network error' });
+  }
 
-    // 3. Bitcoin
+  // 3. Bitcoin
+  if (results[2].status === 'fulfilled') {
+    const btcData = results[2].value;
     if (btcData && !btcData.error) {
+      // 古いデータ警告の表示
+      if (btcData.isStale) {
+        console.warn(`⚠️  ${btcData.staleWarning}`);
+        // UIに警告バナー表示（オプション）
+        const btcCard = document.getElementById('card-btc');
+        if (btcCard) {
+          let warningBanner = btcCard.querySelector('.stale-warning');
+          if (!warningBanner) {
+            warningBanner = document.createElement('div');
+            warningBanner.className = 'stale-warning';
+            btcCard.insertBefore(warningBanner, btcCard.firstChild);
+          }
+          warningBanner.textContent = `⚠️  Data is ${btcData.staleMinutes} min old`;
+        }
+      }
       updateCard('btc', btcData.current, btcData.change, btcData.history);
     } else {
       showError('btc', btcData || { error: true, message: 'CoinGecko API error' });
     }
-
-  } catch (error) {
-    console.error('❌ Fatal error loading data:', error);
-    // 例外を適切に伝播（必要に応じてUIにエラー表示）
-    showError('sp500', { error: true, message: error.message });
-    showError('fang', { error: true, message: error.message });
-    showError('btc', { error: true, message: error.message });
+  } else {
+    console.error('❌ Bitcoin fetch rejected:', results[2].reason);
+    showError('btc', { error: true, message: results[2].reason.message || 'Network error' });
   }
 }
 
 // Initial Load
-loadData().then(() => {
-  // データ読み込み完了後にローディング画面を非表示
+loadData().finally(() => {
+  // データ読み込み完了後にローディング画面を非表示（成功・失敗問わず）
   hideLoading();
 });
 
@@ -163,3 +187,11 @@ function hideLoading() {
 const refreshMessage = `🔄 Data will refresh every ${API_REFRESH_INTERVAL_MINUTES} minutes`;
 console.log(refreshMessage);
 setInterval(loadData, API_REFRESH_INTERVAL_MS);
+
+// ページ離脱時のクリーンアップ（メモリリーク対策）
+window.addEventListener('beforeunload', () => {
+  console.log('🧹 Cleaning up charts...');
+  sp500Chart.destroy();
+  fangChart.destroy();
+  btcChart.destroy();
+});

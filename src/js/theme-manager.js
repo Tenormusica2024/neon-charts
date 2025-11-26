@@ -11,9 +11,17 @@ export class ThemeManager {
     this.body = document.body;
     this.onThemeChange = onThemeChange;
     
-    // LocalStorageからテーマを読み込み
+    // LocalStorageからテーマを読み込み（XSS対策：バリデーション実施）
     const savedTheme = localStorage.getItem('neon-charts-theme');
-    this.isLuxury = savedTheme === 'luxury';
+    // 許可された値のみを受け入れる（XSS対策）
+    const validThemes = ['neon', 'luxury'];
+    if (savedTheme && !validThemes.includes(savedTheme)) {
+      console.warn(`⚠️  Invalid theme value in localStorage: "${savedTheme}". Using default theme.`);
+      localStorage.removeItem('neon-charts-theme'); // 不正な値を削除
+      this.isLuxury = false;
+    } else {
+      this.isLuxury = savedTheme === 'luxury';
+    }
     
     console.log(`✅ Theme loaded from storage: ${this.isLuxury ? 'Luxury' : 'Neon'}`);
     

@@ -48,7 +48,8 @@ const cache = {
     data: {},
     timestamp: {}
 };
-const CACHE_DURATION = 60 * 1000; // 1 minute cache
+// キャッシュ時間をFrontendと統一（Proxyがマスター）
+const CACHE_DURATION = 5 * 60 * 1000; // 5分キャッシュ（Frontendと同期）
 
 async function fetchTwelveData(endpoint) {
     const url = `${BASE_URL}${endpoint}&apikey=${API_KEY}`;
