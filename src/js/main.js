@@ -99,69 +99,51 @@ function updateCard(id, price, change, data) {
 
 // Main Data Loading
 async function loadData() {
-  // Promise.allSettled()で部分的失敗に対応
-  const results = await Promise.allSettled([
+  // 並列実行（3つ同時にリクエスト） - エラーは各API関数内でキャッチ済み
+  const [sp500Data, fangData, btcData] = await Promise.all([
     fetchStockData('SPY'),
     fetchStockData('FNGS'),
     fetchBitcoinData()
   ]);
 
   // 1. S&P 500 (Using SPY ETF as proxy)
-  if (results[0].status === 'fulfilled') {
-    const sp500Data = results[0].value;
-    if (sp500Data && !sp500Data.error) {
-      updateCard('sp500', sp500Data.current, sp500Data.change, sp500Data.historical);
-      const tickerEl = document.querySelector('#card-sp500 .ticker');
-      if (tickerEl) tickerEl.textContent = 'SPY (S&P 500 ETF)';
-    } else {
-      showError('sp500', sp500Data);
-    }
+  if (sp500Data && !sp500Data.error) {
+    updateCard('sp500', sp500Data.current, sp500Data.change, sp500Data.historical);
+    const tickerEl = document.querySelector('#card-sp500 .ticker');
+    if (tickerEl) tickerEl.textContent = 'SPY (S&P 500 ETF)';
   } else {
-    console.error('❌ SPY fetch rejected:', results[0].reason);
-    showError('sp500', { error: true, message: results[0].reason.message || 'Network error' });
+    showError('sp500', sp500Data);
   }
 
   // 2. FANG+ (Using FNGS ETN as proxy)
-  if (results[1].status === 'fulfilled') {
-    const fangData = results[1].value;
-    if (fangData && !fangData.error) {
-      updateCard('fang', fangData.current, fangData.change, fangData.historical);
-      const tickerEl = document.querySelector('#card-fang .ticker');
-      if (tickerEl) tickerEl.textContent = 'FNGS (FANG+ ETN)';
-    } else {
-      showError('fang', fangData);
-    }
+  if (fangData && !fangData.error) {
+    updateCard('fang', fangData.current, fangData.change, fangData.historical);
+    const tickerEl = document.querySelector('#card-fang .ticker');
+    if (tickerEl) tickerEl.textContent = 'FNGS (FANG+ ETN)';
   } else {
-    console.error('❌ FNGS fetch rejected:', results[1].reason);
-    showError('fang', { error: true, message: results[1].reason.message || 'Network error' });
+    showError('fang', fangData);
   }
 
   // 3. Bitcoin
-  if (results[2].status === 'fulfilled') {
-    const btcData = results[2].value;
-    if (btcData && !btcData.error) {
-      // 古いデータ警告の表示
-      if (btcData.isStale) {
-        console.warn(`⚠️  ${btcData.staleWarning}`);
-        // UIに警告バナー表示（オプション）
-        const btcCard = document.getElementById('card-btc');
-        if (btcCard) {
-          let warningBanner = btcCard.querySelector('.stale-warning');
-          if (!warningBanner) {
-            warningBanner = document.createElement('div');
-            warningBanner.className = 'stale-warning';
-            btcCard.insertBefore(warningBanner, btcCard.firstChild);
-          }
-          warningBanner.textContent = `⚠️  Data is ${btcData.staleMinutes} min old`;
+  if (btcData && !btcData.error) {
+    // 古いデータ警告の表示
+    if (btcData.isStale) {
+      console.warn(`⚠️  ${btcData.staleWarning}`);
+      // UIに警告バナー表示
+      const btcCard = document.getElementById('card-btc');
+      if (btcCard) {
+        let warningBanner = btcCard.querySelector('.stale-warning');
+        if (!warningBanner) {
+          warningBanner = document.createElement('div');
+          warningBanner.className = 'stale-warning';
+          btcCard.insertBefore(warningBanner, btcCard.firstChild);
         }
+        warningBanner.textContent = `⚠️  Data is ${btcData.staleMinutes} min old`;
       }
-      updateCard('btc', btcData.current, btcData.change, btcData.history);
-    } else {
-      showError('btc', btcData || { error: true, message: 'CoinGecko API error' });
     }
+    updateCard('btc', btcData.current, btcData.change, btcData.history);
   } else {
-    console.error('❌ Bitcoin fetch rejected:', results[2].reason);
-    showError('btc', { error: true, message: results[2].reason.message || 'Network error' });
+    showError('btc', btcData || { error: true, message: 'CoinGecko API error' });
   }
 }
 
