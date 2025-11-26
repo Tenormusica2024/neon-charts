@@ -108,6 +108,20 @@ async function loadData() {
 
   // 1. S&P 500 (Using SPY ETF as proxy)
   if (sp500Data && !sp500Data.error) {
+    // 古いデータ警告の表示
+    if (sp500Data.isStale) {
+      console.warn(`⚠️  ${sp500Data.staleWarning}`);
+      const sp500Card = document.getElementById('card-sp500');
+      if (sp500Card) {
+        let warningBanner = sp500Card.querySelector('.stale-warning');
+        if (!warningBanner) {
+          warningBanner = document.createElement('div');
+          warningBanner.className = 'stale-warning';
+          sp500Card.insertBefore(warningBanner, sp500Card.firstChild);
+        }
+        warningBanner.textContent = `⚠️  Data is ${sp500Data.staleMinutes} min old`;
+      }
+    }
     updateCard('sp500', sp500Data.current, sp500Data.change, sp500Data.historical);
     const tickerEl = document.querySelector('#card-sp500 .ticker');
     if (tickerEl) tickerEl.textContent = 'SPY (S&P 500 ETF)';
@@ -117,6 +131,20 @@ async function loadData() {
 
   // 2. FANG+ (Using FNGS ETN as proxy)
   if (fangData && !fangData.error) {
+    // 古いデータ警告の表示
+    if (fangData.isStale) {
+      console.warn(`⚠️  ${fangData.staleWarning}`);
+      const fangCard = document.getElementById('card-fang');
+      if (fangCard) {
+        let warningBanner = fangCard.querySelector('.stale-warning');
+        if (!warningBanner) {
+          warningBanner = document.createElement('div');
+          warningBanner.className = 'stale-warning';
+          fangCard.insertBefore(warningBanner, fangCard.firstChild);
+        }
+        warningBanner.textContent = `⚠️  Data is ${fangData.staleMinutes} min old`;
+      }
+    }
     updateCard('fang', fangData.current, fangData.change, fangData.historical);
     const tickerEl = document.querySelector('#card-fang .ticker');
     if (tickerEl) tickerEl.textContent = 'FNGS (FANG+ ETN)';
