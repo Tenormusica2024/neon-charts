@@ -3,11 +3,20 @@ const COINGECKO_URL = 'https://api.coingecko.com/api/v3';
 
 // キャッシュシステム
 const cache = {
-  bitcoin: { data: null, timestamp: 0 }
+  bitcoin: { data: null, timestamp: 0 },
+  SPY: { data: null, timestamp: 0 },
+  FNGS: { data: null, timestamp: 0 }
 };
 const CACHE_DURATION_MS = 5 * 60 * 1000; // 5分
 
 export async function fetchStockData(symbol) {
+  // キャッシュチェック
+  const now = Date.now();
+  if (cache[symbol] && cache[symbol].data && (now - cache[symbol].timestamp < CACHE_DURATION_MS)) {
+    console.log(`📋 Using cached ${symbol} data`);
+    return cache[symbol].data;
+  }
+  
   try {
     const response = await fetch(`${PROXY_URL}/${symbol}`);
     if (!response.ok) {
@@ -16,10 +25,28 @@ export async function fetchStockData(symbol) {
     }
     const data = await response.json();
 
-    // Proxy already formats data for us
+    // キャッシュ更新
+    if (!cache[symbol]) cache[symbol] = { data: null, timestamp: 0 };
+    cache[symbol] = { data, timestamp: now };
+    console.log(`✅ ${symbol} data fetched and cached`);
+
     return data;
   } catch (error) {
     console.error(`Error fetching stock data for ${symbol}:`, error);
+    
+    // エラー時は古いキャッシュを返す（Bitcoinと同様）
+    if (cache[symbol] && cache[symbol].data) {
+      const ageMinutes = Math.floor((Date.now() - cache[symbol].timestamp) / 60000);
+      console.warn(`⚠️  Using stale ${symbol} data from cache (${ageMinutes} minutes old)`);
+      
+      return { 
+        ...cache[symbol].data, 
+        isStale: true, 
+        staleMinutes: ageMinutes,
+        staleWarning: `Data is ${ageMinutes} min old (API error)`
+      };
+    }
+    
     return { error: true, message: error.message };
   }
 }
