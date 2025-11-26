@@ -67,7 +67,11 @@ async function fetchTwelveData(endpoint) {
 
 // Symbol バリデーションミドルウェア
 function validateSymbol(req, res, next) {
-    const { symbol } = req.params;
+    let { symbol } = req.params;
+    
+    // 小文字を大文字に変換（キャッシュの一貫性確保）
+    symbol = symbol.toUpperCase();
+    req.params.symbol = symbol;
     
     // 1-5文字の大文字のみ
     const symbolRegex = /^[A-Z]{1,5}$/;
@@ -78,14 +82,14 @@ function validateSymbol(req, res, next) {
         });
     }
     
-    // 許可リスト（オプション - 必要に応じてコメント解除）
-    // const allowedSymbols = ['SPY', 'FNGS', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'];
-    // if (!allowedSymbols.includes(symbol)) {
-    //     return res.status(403).json({ 
-    //         error: 'Symbol Not Allowed',
-    //         message: `Only these symbols are allowed: ${allowedSymbols.join(', ')}`
-    //     });
-    // }
+    // 許可リスト（本番環境ではAPIクォータ保護のため有効化推奨）
+    const allowedSymbols = ['SPY', 'FNGS'];
+    if (!allowedSymbols.includes(symbol)) {
+        return res.status(403).json({ 
+            error: 'Symbol Not Allowed',
+            message: `Only these symbols are allowed: ${allowedSymbols.join(', ')}`
+        });
+    }
     
     next();
 }
