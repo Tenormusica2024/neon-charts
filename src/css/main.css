@@ -48,6 +48,13 @@ body {
   text-transform: uppercase;
 }
 
+/* エラー表示スタイル */
+.current-price.error {
+  color: #ff0055;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
 /* Theme Switcher */
 .theme-btn {
   background: transparent;

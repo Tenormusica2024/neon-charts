@@ -2,6 +2,10 @@ import { fetchBitcoinData, fetchStockData } from './api.js';
 import { ChartManager } from './charts.js';
 import { ThemeManager } from './theme-manager.js';
 
+// 定数定義（マジックナンバー防止）
+const API_REFRESH_INTERVAL_MS = 10 * 60 * 1000; // 10分
+const API_REFRESH_INTERVAL_MINUTES = 10;
+
 // Initialize Charts
 const sp500Chart = new ChartManager('chart-sp500', '#00f3ff');
 const fangChart = new ChartManager('chart-fang', '#00f3ff');
@@ -13,6 +17,57 @@ const themeManager = new ThemeManager((isLuxury) => {
   fangChart.updateColors(isLuxury);
   btcChart.updateColors(isLuxury);
 });
+
+// 共通エラー処理関数
+function parseApiError(errorData) {
+  if (!errorData || !errorData.error) return null;
+  
+  const errMsg = errorData.message || '';
+  
+  // エラータイプを判定
+  if (errMsg.includes('Unauthorized') || errMsg.includes('Invalid API key')) {
+    return { type: 'auth', message: 'Invalid API Key' };
+  }
+  if (errMsg.includes('Failed to fetch') || errMsg.includes('ECONNREFUSED')) {
+    return { type: 'network', message: 'Proxy Server Down' };
+  }
+  if (errMsg.includes('Rate Limit') || errMsg.includes('429')) {
+    return { type: 'rate', message: 'API Rate Limit' };
+  }
+  if (errMsg.includes('404') || errMsg.includes('Not Found')) {
+    return { type: 'notfound', message: 'Symbol Not Found' };
+  }
+  
+  return { type: 'unknown', message: 'API Error' };
+}
+
+// エラー表示関数
+function showError(cardId, errorData) {
+  const errorInfo = parseApiError(errorData);
+  
+  if (!errorInfo) {
+    console.error(`Unexpected error format for ${cardId}:`, errorData);
+    return;
+  }
+  
+  const priceEl = document.getElementById(`price-${cardId}`);
+  if (!priceEl) {
+    console.error(`Price element not found: price-${cardId}`);
+    return;
+  }
+  
+  priceEl.textContent = errorInfo.message;
+  priceEl.className = 'current-price error';
+  
+  // エラータイプ別の追加情報
+  if (errorInfo.type === 'network') {
+    console.warn('⚠️  Proxy server may not be running. Start it with: node proxy.js');
+  } else if (errorInfo.type === 'auth') {
+    console.error('❌ API Key is invalid. Check your .env file.');
+  } else if (errorInfo.type === 'rate') {
+    console.warn(`⚠️  API rate limit reached. Data will refresh in ${API_REFRESH_INTERVAL_MINUTES} minutes.`);
+  }
+}
 
 // Update UI Helper
 function updateCard(id, price, change, data) {
@@ -45,50 +100,51 @@ function updateCard(id, price, change, data) {
 // Main Data Loading
 async function loadData() {
   try {
+    // 並列実行（3つ同時にリクエスト） - 3倍高速化
+    const [sp500Data, fangData, btcData] = await Promise.all([
+      fetchStockData('SPY'),
+      fetchStockData('FNGS'),
+      fetchBitcoinData()
+    ]);
+
     // 1. S&P 500 (Using SPY ETF as proxy)
-    const sp500Data = await fetchStockData('SPY');
     if (sp500Data && !sp500Data.error) {
       updateCard('sp500', sp500Data.current, sp500Data.change, sp500Data.historical);
-      document.querySelector('#card-sp500 .ticker').textContent = 'SPY (S&P 500 ETF)';
+      const tickerEl = document.querySelector('#card-sp500 .ticker');
+      if (tickerEl) tickerEl.textContent = 'SPY (S&P 500 ETF)';
     } else {
-        let msg = 'API Error';
-        const err = sp500Data?.message || '';
-        if (err.includes('Unauthorized')) msg = 'Invalid Key';
-        else if (err.includes('Failed to fetch')) msg = 'Proxy Down';
-        else if (err.includes('Rate Limit')) msg = 'API Limit';
-
-        document.getElementById('price-sp500').textContent = msg;
-        if (msg === 'Proxy Down') console.warn('Is node proxy.js running?');
+      showError('sp500', sp500Data);
     }
 
     // 2. FANG+ (Using FNGS ETN as proxy)
-    const fangData = await fetchStockData('FNGS');
     if (fangData && !fangData.error) {
       updateCard('fang', fangData.current, fangData.change, fangData.historical);
-      document.querySelector('#card-fang .ticker').textContent = 'FNGS (FANG+ ETN)';
+      const tickerEl = document.querySelector('#card-fang .ticker');
+      if (tickerEl) tickerEl.textContent = 'FNGS (FANG+ ETN)';
     } else {
-        let msg = 'API Error';
-        const err = fangData?.message || '';
-        if (err.includes('Unauthorized')) msg = 'Invalid Key';
-        else if (err.includes('Failed to fetch')) msg = 'Proxy Down';
-        else if (err.includes('Rate Limit')) msg = 'API Limit';
-
-        document.getElementById('price-fang').textContent = msg;
+      showError('fang', fangData);
     }
 
     // 3. Bitcoin
-    const btcData = await fetchBitcoinData();
-    if (btcData) {
+    if (btcData && !btcData.error) {
       updateCard('btc', btcData.current, btcData.change, btcData.history);
+    } else {
+      showError('btc', btcData || { error: true, message: 'CoinGecko API error' });
     }
 
   } catch (error) {
-    console.error('Error loading data:', error);
+    console.error('❌ Fatal error loading data:', error);
+    // 例外を適切に伝播（必要に応じてUIにエラー表示）
+    showError('sp500', { error: true, message: error.message });
+    showError('fang', { error: true, message: error.message });
+    showError('btc', { error: true, message: error.message });
   }
 }
 
 // Initial Load
 loadData();
 
-// Refresh every 10 minutes to avoid API limits
-setInterval(loadData, 600000);
+// 定期的なデータ更新
+const refreshMessage = `🔄 Data will refresh every ${API_REFRESH_INTERVAL_MINUTES} minutes`;
+console.log(refreshMessage);
+setInterval(loadData, API_REFRESH_INTERVAL_MS);
