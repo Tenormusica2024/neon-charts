@@ -27,7 +27,15 @@ export class ChartManager {
       },
       crosshair: {
         vertLine: {
-          labelVisible: false,
+          labelVisible: true,
+        },
+        horzLine: {
+          labelVisible: true,
+        },
+      },
+      localization: {
+        timeFormatter: (time) => {
+          return time;
         },
       },
     });
