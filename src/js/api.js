@@ -1,5 +1,7 @@
-const PROXY_URL = 'http://localhost:3001/api/quote';
+const PROXY_URL = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001/api/quote';
 const COINGECKO_URL = 'https://api.coingecko.com/api/v3';
+
+console.log(`[API] Using proxy URL: ${PROXY_URL}`);
 
 // キャッシュシステム
 const cache = {
