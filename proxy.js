@@ -7,9 +7,36 @@ dotenv.config();
 const app = express();
 const PORT = 3001;
 
-app.use(cors());
+// CORS設定の厳格化 - 本番環境では許可するオリジンを明示的に指定
+const allowedOrigins = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000'
+    // 本番環境のドメインを追加する場合はここに記載
+    // 'https://yourdomain.com'
+];
 
-const API_KEY = process.env.TWELVE_DATA_API_KEY || 'demo'; // User must provide this
+app.use(cors({
+    origin: function(origin, callback) {
+        // originがundefinedの場合（同一オリジン）またはallowedOriginsに含まれる場合は許可
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    }
+}));
+
+// API Key必須化 - 環境変数が設定されていない場合はサーバー起動を拒否
+const API_KEY = process.env.TWELVE_DATA_API_KEY;
+
+if (!API_KEY || API_KEY === 'demo') {
+    console.error('❌ ERROR: TWELVE_DATA_API_KEY environment variable is required.');
+    console.error('Please create a .env file with: TWELVE_DATA_API_KEY=your_api_key_here');
+    console.error('Get your API key from: https://twelvedata.com/');
+    process.exit(1);
+}
 const BASE_URL = 'https://api.twelvedata.com';
 
 app.get('/', (req, res) => {
@@ -37,7 +64,32 @@ async function fetchTwelveData(endpoint) {
     }
 }
 
-app.get('/api/quote/:symbol', async (req, res) => {
+// Symbol バリデーションミドルウェア
+function validateSymbol(req, res, next) {
+    const { symbol } = req.params;
+    
+    // 1-5文字の大文字のみ
+    const symbolRegex = /^[A-Z]{1,5}$/;
+    if (!symbolRegex.test(symbol)) {
+        return res.status(400).json({ 
+            error: 'Invalid Symbol Format',
+            message: 'Symbol must be 1-5 uppercase letters (e.g., SPY, AAPL, GOOGL)'
+        });
+    }
+    
+    // 許可リスト（オプション - 必要に応じてコメント解除）
+    // const allowedSymbols = ['SPY', 'FNGS', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'];
+    // if (!allowedSymbols.includes(symbol)) {
+    //     return res.status(403).json({ 
+    //         error: 'Symbol Not Allowed',
+    //         message: `Only these symbols are allowed: ${allowedSymbols.join(', ')}`
+    //     });
+    // }
+    
+    next();
+}
+
+app.get('/api/quote/:symbol', validateSymbol, async (req, res) => {
     const { symbol } = req.params;
 
     // Check cache

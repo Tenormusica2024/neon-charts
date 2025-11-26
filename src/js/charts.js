@@ -3,6 +3,13 @@ import { AreaSeries, createChart } from 'lightweight-charts';
 export class ChartManager {
   constructor(containerId, colorUp, colorDown) {
     this.container = document.getElementById(containerId);
+    
+    // DOM要素の存在確認
+    if (!this.container) {
+      console.error(`Chart container not found: ${containerId}`);
+      throw new Error(`Chart container element with id "${containerId}" does not exist`);
+    }
+    
     this.chart = createChart(this.container, {
       layout: {
         background: { type: 'solid', color: 'transparent' },
@@ -32,10 +39,13 @@ export class ChartManager {
       lineWidth: 2,
     });
 
-    // Handle resize
-    window.addEventListener('resize', () => {
-      this.chart.resize(this.container.clientWidth, this.container.clientHeight);
-    });
+    // Handle resize - メモリリーク対策のためイベントリスナーを保存
+    this.resizeHandler = () => {
+      if (this.container && this.chart) {
+        this.chart.resize(this.container.clientWidth, this.container.clientHeight);
+      }
+    };
+    window.addEventListener('resize', this.resizeHandler);
   }
 
   updateData(data) {
@@ -62,5 +72,23 @@ export class ChartManager {
         horzLines: { color: isLuxury ? 'rgba(212, 175, 55, 0.05)' : 'rgba(255, 255, 255, 0.05)' },
       }
     });
+  }
+  
+  // チャート破棄時のクリーンアップ（メモリリーク対策）
+  destroy() {
+    // イベントリスナーを削除
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+      this.resizeHandler = null;
+    }
+    
+    // チャートを破棄
+    if (this.chart) {
+      this.chart.remove();
+      this.chart = null;
+    }
+    
+    this.series = null;
+    this.container = null;
   }
 }
