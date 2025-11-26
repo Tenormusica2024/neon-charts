@@ -142,7 +142,22 @@ async function loadData() {
 }
 
 // Initial Load
-loadData();
+loadData().then(() => {
+  // データ読み込み完了後にローディング画面を非表示
+  hideLoading();
+});
+
+// ローディング画面を非表示にする関数
+function hideLoading() {
+  const loadingOverlay = document.getElementById('loading-overlay');
+  if (loadingOverlay) {
+    loadingOverlay.classList.add('hidden');
+    // アニメーション完了後にDOMから削除
+    setTimeout(() => {
+      loadingOverlay.remove();
+    }, 500);
+  }
+}
 
 // 定期的なデータ更新
 const refreshMessage = `🔄 Data will refresh every ${API_REFRESH_INTERVAL_MINUTES} minutes`;

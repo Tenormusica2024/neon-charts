@@ -64,7 +64,32 @@ async function fetchTwelveData(endpoint) {
     }
 }
 
-app.get('/api/quote/:symbol', async (req, res) => {
+// Symbol バリデーションミドルウェア
+function validateSymbol(req, res, next) {
+    const { symbol } = req.params;
+    
+    // 1-5文字の大文字のみ
+    const symbolRegex = /^[A-Z]{1,5}$/;
+    if (!symbolRegex.test(symbol)) {
+        return res.status(400).json({ 
+            error: 'Invalid Symbol Format',
+            message: 'Symbol must be 1-5 uppercase letters (e.g., SPY, AAPL, GOOGL)'
+        });
+    }
+    
+    // 許可リスト（オプション - 必要に応じてコメント解除）
+    // const allowedSymbols = ['SPY', 'FNGS', 'AAPL', 'GOOGL', 'MSFT', 'AMZN', 'TSLA'];
+    // if (!allowedSymbols.includes(symbol)) {
+    //     return res.status(403).json({ 
+    //         error: 'Symbol Not Allowed',
+    //         message: `Only these symbols are allowed: ${allowedSymbols.join(', ')}`
+    //     });
+    // }
+    
+    next();
+}
+
+app.get('/api/quote/:symbol', validateSymbol, async (req, res) => {
     const { symbol } = req.params;
 
     // Check cache

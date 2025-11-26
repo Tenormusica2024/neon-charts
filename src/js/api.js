@@ -1,6 +1,12 @@
 const PROXY_URL = 'http://localhost:3001/api/quote';
 const COINGECKO_URL = 'https://api.coingecko.com/api/v3';
 
+// キャッシュシステム
+const cache = {
+  bitcoin: { data: null, timestamp: 0 }
+};
+const CACHE_DURATION_MS = 5 * 60 * 1000; // 5分
+
 export async function fetchStockData(symbol) {
   try {
     const response = await fetch(`${PROXY_URL}/${symbol}`);
@@ -19,6 +25,13 @@ export async function fetchStockData(symbol) {
 }
 
 export async function fetchBitcoinData() {
+  // キャッシュチェック
+  const now = Date.now();
+  if (cache.bitcoin.data && (now - cache.bitcoin.timestamp < CACHE_DURATION_MS)) {
+    console.log('📋 Using cached Bitcoin data');
+    return cache.bitcoin.data;
+  }
+  
   try {
     // Fetch current price and 30-day history
     const [priceRes, historyRes] = await Promise.all([
@@ -43,14 +56,26 @@ export async function fetchBitcoinData() {
       .map(([time, value]) => ({ time, value }))
       .sort((a, b) => new Date(a.time) - new Date(b.time));
 
-    return {
+    const result = {
       current: priceData.bitcoin.usd,
       change: priceData.bitcoin.usd_24h_change,
       history: sortedHistory
     };
+    
+    // キャッシュ更新
+    cache.bitcoin = { data: result, timestamp: now };
+    console.log('✅ Bitcoin data fetched and cached');
+    return result;
   } catch (error) {
-    console.error('Error fetching Bitcoin data:', error);
-    return null;
+    console.error('❌ Error fetching Bitcoin data:', error);
+    
+    // エラー時は古いキャッシュを返す（可能なら）
+    if (cache.bitcoin.data) {
+      console.warn('⚠️  Using stale Bitcoin data from cache');
+      return cache.bitcoin.data;
+    }
+    
+    return { error: true, message: error.message };
   }
 }
 
