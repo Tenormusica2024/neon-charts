@@ -1,6 +1,13 @@
 export class ThemeManager {
   constructor(onThemeChange) {
     this.toggleBtn = document.getElementById('theme-toggle');
+    
+    // DOM要素の存在確認
+    if (!this.toggleBtn) {
+      console.error('Theme toggle button not found: theme-toggle');
+      throw new Error('Theme toggle button element with id "theme-toggle" does not exist');
+    }
+    
     this.body = document.body;
     this.isLuxury = false;
     this.onThemeChange = onThemeChange;
