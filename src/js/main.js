@@ -1,6 +1,7 @@
 import { fetchBitcoinData, fetchStockData } from './api.js';
 import { ChartManager } from './charts.js';
 import { ThemeManager } from './theme-manager.js';
+import { logger } from './logger.js';
 
 // 定数定義（マジックナンバー防止）
 const API_REFRESH_INTERVAL_MS = 10 * 60 * 1000; // 10分
@@ -46,13 +47,13 @@ function showError(cardId, errorData) {
   const errorInfo = parseApiError(errorData);
   
   if (!errorInfo) {
-    console.error(`Unexpected error format for ${cardId}:`, errorData);
+    logger.error(`Unexpected error format for ${cardId}:`, errorData);
     return;
   }
   
   const priceEl = document.getElementById(`price-${cardId}`);
   if (!priceEl) {
-    console.error(`Price element not found: price-${cardId}`);
+    logger.error(`Price element not found: price-${cardId}`);
     return;
   }
   
@@ -61,11 +62,11 @@ function showError(cardId, errorData) {
   
   // エラータイプ別の追加情報
   if (errorInfo.type === 'network') {
-    console.warn('⚠️  Proxy server may not be running. Start it with: node proxy.js');
+    logger.warn('⚠️  Proxy server may not be running. Start it with: node proxy.js');
   } else if (errorInfo.type === 'auth') {
-    console.error('❌ API Key is invalid. Check your .env file.');
+    logger.error('❌ API Key is invalid. Check your .env file.');
   } else if (errorInfo.type === 'rate') {
-    console.warn(`⚠️  API rate limit reached. Data will refresh in ${API_REFRESH_INTERVAL_MINUTES} minutes.`);
+    logger.warn(`⚠️  API rate limit reached. Data will refresh in ${API_REFRESH_INTERVAL_MINUTES} minutes.`);
   }
 }
 
@@ -97,20 +98,31 @@ function updateCard(id, price, change, data) {
   if (id === 'btc') btcChart.updateData(data);
 }
 
+function showRefreshIndicator() {
+  const indicator = document.createElement('div');
+  indicator.className = 'refresh-indicator';
+  indicator.textContent = '🔄 Updating...';
+  document.body.appendChild(indicator);
+  return indicator;
+}
+
 // Main Data Loading
 async function loadData() {
-  // 並列実行（3つ同時にリクエスト） - エラーは各API関数内でキャッチ済み
-  const [sp500Data, fangData, btcData] = await Promise.all([
-    fetchStockData('SPY'),
-    fetchStockData('FNGS'),
-    fetchBitcoinData()
-  ]);
+  const indicator = showRefreshIndicator();
+  
+  try {
+    // 並列実行（3つ同時にリクエスト） - エラーは各API関数内でキャッチ済み
+    const [sp500Data, fangData, btcData] = await Promise.all([
+      fetchStockData('SPY'),
+      fetchStockData('FNGS'),
+      fetchBitcoinData()
+    ]);
 
   // 1. S&P 500 (Using SPY ETF as proxy)
   if (sp500Data && !sp500Data.error) {
     // 古いデータ警告の表示
     if (sp500Data.isStale) {
-      console.warn(`⚠️  ${sp500Data.staleWarning}`);
+      logger.warn(`⚠️  ${sp500Data.staleWarning}`);
       const sp500Card = document.getElementById('card-sp500');
       if (sp500Card) {
         let warningBanner = sp500Card.querySelector('.stale-warning');
@@ -133,7 +145,7 @@ async function loadData() {
   if (fangData && !fangData.error) {
     // 古いデータ警告の表示
     if (fangData.isStale) {
-      console.warn(`⚠️  ${fangData.staleWarning}`);
+      logger.warn(`⚠️  ${fangData.staleWarning}`);
       const fangCard = document.getElementById('card-fang');
       if (fangCard) {
         let warningBanner = fangCard.querySelector('.stale-warning');
@@ -156,7 +168,7 @@ async function loadData() {
   if (btcData && !btcData.error) {
     // 古いデータ警告の表示
     if (btcData.isStale) {
-      console.warn(`⚠️  ${btcData.staleWarning}`);
+      logger.warn(`⚠️  ${btcData.staleWarning}`);
       // UIに警告バナー表示
       const btcCard = document.getElementById('card-btc');
       if (btcCard) {
@@ -172,6 +184,9 @@ async function loadData() {
     updateCard('btc', btcData.current, btcData.change, btcData.history);
   } else {
     showError('btc', btcData || { error: true, message: 'CoinGecko API error' });
+  }
+  } finally {
+    indicator?.remove();
   }
 }
 
@@ -195,12 +210,12 @@ function hideLoading() {
 
 // 定期的なデータ更新
 const refreshMessage = `🔄 Data will refresh every ${API_REFRESH_INTERVAL_MINUTES} minutes`;
-console.log(refreshMessage);
+logger.log(refreshMessage);
 setInterval(loadData, API_REFRESH_INTERVAL_MS);
 
 // ページ離脱時のクリーンアップ（メモリリーク対策）
 window.addEventListener('beforeunload', () => {
-  console.log('🧹 Cleaning up charts...');
+  logger.log('🧹 Cleaning up charts...');
   sp500Chart.destroy();
   fangChart.destroy();
   btcChart.destroy();

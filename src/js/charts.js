@@ -1,4 +1,5 @@
 import { AreaSeries, createChart } from 'lightweight-charts';
+import { logger } from './logger.js';
 
 export class ChartManager {
   constructor(containerId, colorUp, colorDown) {
@@ -6,7 +7,7 @@ export class ChartManager {
     
     // DOM要素の存在確認
     if (!this.container) {
-      console.error(`Chart container not found: ${containerId}`);
+      logger.error(`Chart container not found: ${containerId}`);
       throw new Error(`Chart container element with id "${containerId}" does not exist`);
     }
     
@@ -91,12 +92,16 @@ export class ChartManager {
     }
     
     // チャートを破棄
-    if (this.chart) {
-      this.chart.remove();
+    try {
+      if (this.chart) {
+        this.chart.remove();
+      }
+    } catch (error) {
+      logger.warn('Chart removal error (may already be destroyed):', error);
+    } finally {
       this.chart = null;
+      this.series = null;
+      this.container = null;
     }
-    
-    this.series = null;
-    this.container = null;
   }
 }

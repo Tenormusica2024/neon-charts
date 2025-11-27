@@ -144,6 +144,27 @@ body {
   margin-bottom: 3rem;
 }
 
+/* Refresh Indicator */
+.refresh-indicator {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(0, 243, 255, 0.2);
+  border: 1px solid var(--accent-cyan);
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  color: var(--accent-cyan);
+  backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
 /* Chart Cards */
 .chart-card {
   background: var(--card-bg);
