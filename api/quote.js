@@ -14,15 +14,38 @@ const cache = {
   timestamp: {}
 };
 const CACHE_DURATION = 5 * 60 * 1000;
+const MAX_CACHE_ENTRIES = 10;
+
+function cleanOldCache() {
+  const entries = Object.entries(cache.timestamp);
+  
+  if (entries.length > MAX_CACHE_ENTRIES) {
+    entries.sort((a, b) => a[1] - b[1]);
+    const toDelete = entries.slice(0, entries.length - MAX_CACHE_ENTRIES);
+    toDelete.forEach(([symbol]) => {
+      delete cache.data[symbol];
+      delete cache.timestamp[symbol];
+    });
+  }
+}
 
 function setCorsHeaders(req, res) {
   const origin = req.headers.origin;
   
-  if (!origin || allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+  if (origin && allowedOrigins.includes(origin)) {
+    res.setHeader('Access-Control-Allow-Origin', origin);
     res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return true;
+  } else if (req.method === 'OPTIONS') {
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    return true;
+  } else if (origin) {
+    res.status(403).json({ error: 'Forbidden: Invalid origin' });
+    return false;
   }
+  return true;
 }
 
 function validateSymbol(symbol) {
@@ -69,7 +92,7 @@ async function fetchTwelveData(endpoint, apiKey) {
 }
 
 export default async function handler(req, res) {
-  setCorsHeaders(req, res);
+  if (!setCorsHeaders(req, res)) return;
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -134,13 +157,13 @@ export default async function handler(req, res) {
     
     cache.data[symbol] = result;
     cache.timestamp[symbol] = Date.now();
+    cleanOldCache();
     
     return res.json(result);
   } catch (error) {
     console.error(`Error processing ${symbol}:`, error);
-    const safeMessage = process.env.NODE_ENV === 'production' 
-      ? 'Internal Server Error' 
-      : error.message;
+    const isProduction = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+    const safeMessage = isProduction ? 'Internal Server Error' : error.message;
     return res.status(500).json({ error: safeMessage });
   }
 }

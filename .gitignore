@@ -5,3 +5,4 @@ node_modules
 dist
 push_to_github.bat
 .vercel
+.env*.local

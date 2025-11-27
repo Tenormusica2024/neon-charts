@@ -1,6 +1,11 @@
 const PROXY_URL = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001/api/quote';
 const COINGECKO_URL = 'https://api.coingecko.com/api/v3';
 
+if (!import.meta.env.VITE_PROXY_URL && import.meta.env.MODE === 'production') {
+  console.error('❌ FATAL: VITE_PROXY_URL is not set in production environment');
+  alert('Configuration error. Please contact the administrator.');
+}
+
 console.log(`[API] Using proxy URL: ${PROXY_URL}`);
 
 // キャッシュシステム
