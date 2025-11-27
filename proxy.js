@@ -50,16 +50,45 @@ const cache = {
 };
 // キャッシュ時間をFrontendと統一（Proxyがマスター）
 const CACHE_DURATION = 5 * 60 * 1000; // 5分キャッシュ（Frontendと同期）
+const MAX_CACHE_ENTRIES = 10; // メモリリーク対策: 最大10エントリまで
+
+// キャッシュクリーンアップ関数（古いエントリを削除）
+function cleanOldCache() {
+    const entries = Object.entries(cache.timestamp);
+    if (entries.length > MAX_CACHE_ENTRIES) {
+        entries.sort((a, b) => a[1] - b[1]); // タイムスタンプでソート
+        const toDelete = entries.slice(0, entries.length - MAX_CACHE_ENTRIES);
+        toDelete.forEach(([symbol]) => {
+            delete cache.data[symbol];
+            delete cache.timestamp[symbol];
+        });
+        console.log(`🧹 Cache cleaned: removed ${toDelete.length} old entries`);
+    }
+}
 
 async function fetchTwelveData(endpoint) {
     const url = `${BASE_URL}${endpoint}&apikey=${API_KEY}`;
+    
+    // タイムアウト設定（10秒）
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    
     try {
-        const response = await fetch(url);
+        const response = await fetch(url, { signal: controller.signal });
+        clearTimeout(timeoutId);
+        
         if (!response.ok) {
             throw new Error(`Twelve Data API Error: ${response.statusText}`);
         }
         return await response.json();
     } catch (error) {
+        clearTimeout(timeoutId);
+        
+        if (error.name === 'AbortError') {
+            console.error(`⏱️  Request timeout for ${endpoint}`);
+            return { status: 'error', message: 'Request timeout (10s)' };
+        }
+        
         console.error(`Fetch error for ${endpoint}:`, error);
         return { status: 'error', message: error.message };
     }
@@ -137,11 +166,28 @@ app.get('/api/quote/:symbol', validateSymbol, async (req, res) => {
         // Update cache
         cache.data[symbol] = result;
         cache.timestamp[symbol] = Date.now();
+        cleanOldCache(); // キャッシュサイズ制限
 
         res.json(result);
     } catch (error) {
         console.error(`Error processing ${symbol}:`, error);
-        res.status(500).json({ error: error.message || 'Internal Server Error' });
+        
+        // 本番環境ではエラー詳細を隠蔽
+        const isProduction = process.env.NODE_ENV === 'production';
+        const errorMessage = isProduction ? 'Internal Server Error' : error.message;
+        
+        // 古いキャッシュがあればフォールバック
+        if (cache.data[symbol]) {
+            const cacheAge = Date.now() - cache.timestamp[symbol];
+            console.warn(`⚠️  Using stale cache for ${symbol} (age: ${Math.floor(cacheAge / 1000)}s)`);
+            return res.json({
+                ...cache.data[symbol],
+                _stale: true,
+                _cacheAge: cacheAge
+            });
+        }
+        
+        res.status(500).json({ error: errorMessage });
     }
 });
 
