@@ -1,0 +1,20 @@
+{
+  "SPY": {
+    "current": 0,
+    "change": 0,
+    "historical": [],
+    "last_updated": "2025-12-01T00:00:00.000Z"
+  },
+  "FANG": {
+    "current": 0,
+    "change": 0,
+    "historical": [],
+    "last_updated": "2025-12-01T00:00:00.000Z"
+  },
+  "BTC": {
+    "current": 0,
+    "change": 0,
+    "historical": [],
+    "last_updated": "2025-12-01T00:00:00.000Z"
+  }
+}
