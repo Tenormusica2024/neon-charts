@@ -1,130 +1,69 @@
-import { logger } from './logger.js';
-
-const PROXY_URL = import.meta.env.VITE_PROXY_URL || 'http://localhost:3001/api/quote';
+const MARKET_DATA_URL = './market_data.json';
 const COINGECKO_URL = 'https://api.coingecko.com/api/v3';
 
-if (!import.meta.env.VITE_PROXY_URL && import.meta.env.MODE === 'production') {
-  logger.error('❌ FATAL: VITE_PROXY_URL is not set in production environment');
-  alert('Configuration error. Please contact the administrator.');
-}
+let marketDataCache = null;
+let lastFetchTime = 0;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-logger.log(`[API] Using proxy URL: ${PROXY_URL}`);
-
-// キャッシュシステム
-const cache = {
-  bitcoin: { data: null, timestamp: 0 },
-  SPY: { data: null, timestamp: 0 },
-  FNGS: { data: null, timestamp: 0 }
-};
-const CACHE_DURATION_MS = 5 * 60 * 1000; // 5分
-
-const rateLimiter = {
-  requests: [],
-  maxRequests: 7,
-  windowMs: 60 * 1000
-};
-
-async function checkRateLimit() {
+async function fetchMarketData() {
   const now = Date.now();
-  rateLimiter.requests = rateLimiter.requests.filter(t => now - t < rateLimiter.windowMs);
   
-  if (rateLimiter.requests.length >= rateLimiter.maxRequests) {
-    const oldestRequest = rateLimiter.requests[0];
-    const waitTime = rateLimiter.windowMs - (now - oldestRequest);
-    logger.warn(`Rate limit reached. Waiting ${Math.ceil(waitTime / 1000)}s...`);
-    await new Promise(resolve => setTimeout(resolve, waitTime));
+  // Return cached data if still fresh
+  if (marketDataCache && (now - lastFetchTime) < CACHE_DURATION) {
+    return marketDataCache;
   }
   
-  rateLimiter.requests.push(now);
+  try {
+    const response = await fetch(`${MARKET_DATA_URL}?t=${now}`);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch market data: ${response.statusText}`);
+    }
+    marketDataCache = await response.json();
+    lastFetchTime = now;
+    return marketDataCache;
+  } catch (error) {
+    console.error('Error fetching market data:', error);
+    // Return cached data even if expired, better than nothing
+    if (marketDataCache) {
+      console.warn('Using stale cache due to fetch error');
+      return marketDataCache;
+    }
+    throw error;
+  }
 }
 
 export async function fetchStockData(symbol) {
-  // キャッシュチェック
-  const now = Date.now();
-  if (cache[symbol] && cache[symbol].data && (now - cache[symbol].timestamp < CACHE_DURATION_MS)) {
-    logger.log(`📋 Using cached ${symbol} data`);
-    return cache[symbol].data;
-  }
-  
-  await checkRateLimit();
-  
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const marketData = await fetchMarketData();
     
-    const response = await fetch(`${PROXY_URL}/${symbol}`, {
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
-    if (!response.ok) {
-        const errData = await response.json().catch(() => ({}));
-        throw new Error(errData.error || response.statusText);
+    // Map symbol to data key
+    const dataKey = symbol === 'SPY' ? 'SPY' : symbol === 'FNGS' ? 'FANG' : null;
+    
+    if (!dataKey || !marketData[dataKey]) {
+      throw new Error(`No data available for ${symbol}`);
     }
-    const data = await response.json();
-
-    // キャッシュ更新
-    if (!cache[symbol]) cache[symbol] = { data: null, timestamp: 0 };
-    cache[symbol] = { data, timestamp: now };
-    logger.log(`✅ ${symbol} data fetched and cached`);
-
-    return data;
+    
+    const data = marketData[dataKey];
+    
+    return {
+      current: data.current,
+      change: data.change,
+      history: data.historical || [],
+      lastUpdated: data.last_updated
+    };
   } catch (error) {
-    if (error.name === 'AbortError') {
-      logger.error(`Request timeout for ${symbol}`);
-      if (cache[symbol] && cache[symbol].data) {
-        const ageMinutes = Math.floor((Date.now() - cache[symbol].timestamp) / 60000);
-        logger.warn(`⚠️  Using stale ${symbol} data from cache (${ageMinutes} minutes old)`);
-        return { 
-          ...cache[symbol].data, 
-          isStale: true, 
-          staleMinutes: ageMinutes,
-          staleWarning: `Data is ${ageMinutes} min old (Timeout)`
-        };
-      }
-      return { error: true, message: 'Request timeout. Please try again.' };
-    }
-    
-    logger.error(`Error fetching stock data for ${symbol}:`, error);
-    
-    // エラー時は古いキャッシュを返す（Bitcoinと同様）
-    if (cache[symbol] && cache[symbol].data) {
-      const ageMinutes = Math.floor((Date.now() - cache[symbol].timestamp) / 60000);
-      logger.warn(`⚠️  Using stale ${symbol} data from cache (${ageMinutes} minutes old)`);
-      
-      return { 
-        ...cache[symbol].data, 
-        isStale: true, 
-        staleMinutes: ageMinutes,
-        staleWarning: `Data is ${ageMinutes} min old (API error)`
-      };
-    }
-    
+    console.error(`Error fetching stock data for ${symbol}:`, error);
     return { error: true, message: error.message };
   }
 }
 
 export async function fetchBitcoinData() {
-  // キャッシュチェック
-  const now = Date.now();
-  if (cache.bitcoin.data && (now - cache.bitcoin.timestamp < CACHE_DURATION_MS)) {
-    logger.log('📋 Using cached Bitcoin data');
-    return cache.bitcoin.data;
-  }
-  
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-    
     // Fetch current price and 30-day history
     const [priceRes, historyRes] = await Promise.all([
-      fetch(`${COINGECKO_URL}/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true`, {
-        signal: controller.signal
-      }),
-      fetch(`${COINGECKO_URL}/coins/bitcoin/market_chart?vs_currency=usd&days=30&interval=daily`, {
-        signal: controller.signal
-      })
+      fetch(`${COINGECKO_URL}/simple/price?ids=bitcoin&vs_currencies=usd&include_24hr_change=true`),
+      fetch(`${COINGECKO_URL}/coins/bitcoin/market_chart?vs_currency=usd&days=30&interval=daily`)
     ]);
-    clearTimeout(timeoutId);
 
     if (!priceRes.ok || !historyRes.ok) throw new Error('CoinGecko API error');
 
@@ -143,49 +82,14 @@ export async function fetchBitcoinData() {
       .map(([time, value]) => ({ time, value }))
       .sort((a, b) => new Date(a.time) - new Date(b.time));
 
-    const result = {
+    return {
       current: priceData.bitcoin.usd,
       change: priceData.bitcoin.usd_24h_change,
       history: sortedHistory
     };
-    
-    // キャッシュ更新
-    cache.bitcoin = { data: result, timestamp: now };
-    logger.log('✅ Bitcoin data fetched and cached');
-    return result;
   } catch (error) {
-    if (error.name === 'AbortError') {
-      logger.error('Request timeout for Bitcoin');
-      if (cache.bitcoin.data) {
-        const ageMinutes = Math.floor((Date.now() - cache.bitcoin.timestamp) / 60000);
-        logger.warn(`⚠️  Using stale Bitcoin data from cache (${ageMinutes} minutes old)`);
-        return { 
-          ...cache.bitcoin.data, 
-          isStale: true, 
-          staleMinutes: ageMinutes,
-          staleWarning: `Data is ${ageMinutes} min old (Timeout)`
-        };
-      }
-      return { error: true, message: 'Request timeout. Please try again.' };
-    }
-    
-    logger.error('❌ Error fetching Bitcoin data:', error);
-    
-    // エラー時は古いキャッシュを返す（可能なら）
-    if (cache.bitcoin.data) {
-      const ageMinutes = Math.floor((Date.now() - cache.bitcoin.timestamp) / 60000);
-      logger.warn(`⚠️  Using stale Bitcoin data from cache (${ageMinutes} minutes old)`);
-      
-      // 古いデータであることをUIに通知するためのフラグを追加
-      return { 
-        ...cache.bitcoin.data, 
-        isStale: true, 
-        staleMinutes: ageMinutes,
-        staleWarning: `Data is ${ageMinutes} min old (API error)`
-      };
-    }
-    
-    return { error: true, message: error.message };
+    console.error('Error fetching Bitcoin data:', error);
+    return null;
   }
 }
 
