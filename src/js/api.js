@@ -48,7 +48,7 @@ export async function fetchStockData(symbol) {
     return {
       current: data.current,
       change: data.change,
-      history: data.historical || [],
+      historical: data.historical || [],
       lastUpdated: data.last_updated
     };
   } catch (error) {
