@@ -10,8 +10,9 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // API Configuration
-const POLYGON_API_KEY = process.env.POLYGON_API_KEY;
+const TWELVE_DATA_API_KEY = process.env.TWELVE_DATA_API_KEY;
 const COINGECKO_URL = 'https://api.coingecko.com/api/v3';
+const TWELVE_DATA_URL = 'https://api.twelvedata.com';
 
 // Retry configuration
 const MAX_RETRIES = 3;
@@ -40,29 +41,29 @@ async function fetchWithRetry(url, options = {}, retries = MAX_RETRIES) {
   }
 }
 
-async function fetchPolygonData(ticker) {
-  const url = `https://api.polygon.io/v2/aggs/ticker/${ticker}/prev?adjusted=true&apiKey=${POLYGON_API_KEY}`;
+async function fetchTwelveData(symbol) {
+  const url = `${TWELVE_DATA_URL}/time_series?symbol=${symbol}&interval=1day&outputsize=30&apikey=${TWELVE_DATA_API_KEY}`;
   
   try {
     const data = await fetchWithRetry(url);
     
-    if (!data.results || data.results.length === 0) {
-      throw new Error(`No data returned for ${ticker}`);
+    if (data.status === 'error' || !data.values) {
+      throw new Error(`No data returned for ${symbol}: ${data.message || 'Unknown error'}`);
     }
     
-    const result = data.results[0];
-    const current = result.c; // Close price
-    const open = result.o;
-    const change = ((current - open) / open) * 100;
+    const values = data.values;
+    const currentPrice = parseFloat(values[0].close);
+    const prevPrice = parseFloat(values[1].close);
+    const change = ((currentPrice - prevPrice) / prevPrice) * 100;
     
     return {
-      current: parseFloat(current.toFixed(2)),
+      current: parseFloat(currentPrice.toFixed(2)),
       change: parseFloat(change.toFixed(2)),
       historical: [],
       last_updated: new Date().toISOString()
     };
   } catch (error) {
-    console.error(`Error fetching ${ticker}:`, error.message);
+    console.error(`Error fetching ${symbol}:`, error.message);
     throw error;
   }
 }
@@ -93,16 +94,16 @@ async function updateMarketData() {
   console.log('Starting market data update...');
   console.log(`Timestamp: ${new Date().toISOString()}`);
   
-  if (!POLYGON_API_KEY) {
-    throw new Error('POLYGON_API_KEY environment variable is not set');
+  if (!TWELVE_DATA_API_KEY) {
+    throw new Error('TWELVE_DATA_API_KEY environment variable is not set');
   }
   
   try {
     // Fetch all data in parallel
     console.log('Fetching market data...');
     const [spyData, fangData, btcData] = await Promise.all([
-      fetchPolygonData('SPY'),
-      fetchPolygonData('FNGS'),
+      fetchTwelveData('SPY'),
+      fetchTwelveData('FNGS'),
       fetchBitcoinData()
     ]);
     
