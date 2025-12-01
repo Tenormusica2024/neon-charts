@@ -1,0 +1,20 @@
+{
+  "SPY": {
+    "current": 683.39,
+    "change": 0.55,
+    "historical": [],
+    "last_updated": "2025-12-01T13:49:58.747Z"
+  },
+  "FANG": {
+    "current": 71.69,
+    "change": 0.62,
+    "historical": [],
+    "last_updated": "2025-12-01T13:49:58.753Z"
+  },
+  "BTC": {
+    "current": 85760,
+    "change": -6.47,
+    "historical": [],
+    "last_updated": "2025-12-01T13:49:58.721Z"
+  }
+}
