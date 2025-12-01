@@ -56,10 +56,16 @@ async function fetchTwelveData(symbol) {
     const prevPrice = parseFloat(values[1].close);
     const change = ((currentPrice - prevPrice) / prevPrice) * 100;
     
+    // Format historical data for lightweight-charts (ascending order)
+    const historical = values.map(v => ({
+      time: v.datetime,
+      value: parseFloat(v.close)
+    })).reverse(); // Twelve Data returns newest first, chart needs oldest first
+    
     return {
       current: parseFloat(currentPrice.toFixed(2)),
       change: parseFloat(change.toFixed(2)),
-      historical: [],
+      historical: historical,
       last_updated: new Date().toISOString()
     };
   } catch (error) {
