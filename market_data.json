@@ -124,7 +124,7 @@
         "value": 685.69
       }
     ],
-    "last_updated": "2025-12-06T14:42:15.237Z"
+    "last_updated": "2025-12-07T14:43:06.226Z"
   },
   "FANG": {
     "current": 71.92,
@@ -251,12 +251,12 @@
         "value": 71.92
       }
     ],
-    "last_updated": "2025-12-06T14:42:15.237Z"
+    "last_updated": "2025-12-07T14:43:06.230Z"
   },
   "BTC": {
-    "current": 90073,
-    "change": -0.31,
+    "current": 88298,
+    "change": -1.9,
     "historical": [],
-    "last_updated": "2025-12-06T14:42:15.293Z"
+    "last_updated": "2025-12-07T14:43:06.173Z"
   }
 }
