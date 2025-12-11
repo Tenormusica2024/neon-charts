@@ -1,12 +1,8 @@
 {
   "SPY": {
-    "current": 682.89,
-    "change": -0.02,
+    "current": 684.91,
+    "change": -0.39,
     "historical": [
-      {
-        "time": "2025-10-29",
-        "value": 687.39001
-      },
       {
         "time": "2025-10-30",
         "value": 679.83002
@@ -121,19 +117,19 @@
       },
       {
         "time": "2025-12-10",
-        "value": 682.89
+        "value": 687.57001
+      },
+      {
+        "time": "2025-12-11",
+        "value": 684.91
       }
     ],
-    "last_updated": "2025-12-10T14:51:14.489Z"
+    "last_updated": "2025-12-11T14:47:37.034Z"
   },
   "FANG": {
-    "current": 71.88,
-    "change": 0.13,
+    "current": 71.74,
+    "change": -0.19,
     "historical": [
-      {
-        "time": "2025-10-28",
-        "value": 73.36
-      },
       {
         "time": "2025-10-29",
         "value": 73.88
@@ -249,14 +245,18 @@
       {
         "time": "2025-12-09",
         "value": 71.88
+      },
+      {
+        "time": "2025-12-10",
+        "value": 71.74
       }
     ],
-    "last_updated": "2025-12-10T14:51:14.489Z"
+    "last_updated": "2025-12-11T14:47:36.535Z"
   },
   "BTC": {
-    "current": 91858,
-    "change": 1.87,
+    "current": 90280,
+    "change": -1.72,
     "historical": [],
-    "last_updated": "2025-12-10T14:51:14.515Z"
+    "last_updated": "2025-12-11T14:47:36.535Z"
   }
 }
