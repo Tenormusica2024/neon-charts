@@ -112,9 +112,9 @@ async function updateMarketData() {
       fetchTwelveData('FNGS'),
       fetchBitcoinData(),
       fetchTwelveData('USD/JPY'),
-      fetchTwelveData('^TNX'),
-      fetchTwelveData('GC=F'),
-      fetchTwelveData('^VIX'),
+      fetchTwelveData('TNX'),
+      fetchTwelveData('XAUUSD'),
+      fetchTwelveData('VIX'),
       fetchTwelveData('QQQ')
     ]);
     

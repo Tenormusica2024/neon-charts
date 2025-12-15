@@ -41,9 +41,9 @@ export async function fetchStockData(symbol) {
       'SPY': 'SPY',
       'FNGS': 'FANG',
       'USD/JPY': 'USDJPY',
-      '^TNX': 'TNX',
-      'GC=F': 'GOLD',
-      '^VIX': 'VIX',
+      'TNX': 'TNX',
+      'XAUUSD': 'GOLD',
+      'VIX': 'VIX',
       'QQQ': 'QQQ'
     };
     

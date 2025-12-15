@@ -132,9 +132,9 @@ async function loadData() {
       fetchStockData('FNGS'),
       fetchBitcoinData(),
       fetchStockData('USD/JPY'),
-      fetchStockData('^TNX'),
-      fetchStockData('GC=F'),
-      fetchStockData('^VIX'),
+      fetchStockData('TNX'),
+      fetchStockData('XAUUSD'),
+      fetchStockData('VIX'),
       fetchStockData('QQQ')
     ]);
 
