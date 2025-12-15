@@ -12,7 +12,6 @@ const sp500Chart = new ChartManager('chart-sp500', '#00f3ff');
 const fangChart = new ChartManager('chart-fang', '#00f3ff');
 const btcChart = new ChartManager('chart-btc', '#00f3ff');
 const usdjpyChart = new ChartManager('chart-usdjpy', '#00f3ff');
-const tnxChart = new ChartManager('chart-tnx', '#00f3ff');
 const goldChart = new ChartManager('chart-gold', '#00f3ff');
 const qqqChart = new ChartManager('chart-qqq', '#00f3ff');
 
@@ -22,7 +21,6 @@ const themeManager = new ThemeManager((isLuxury) => {
   fangChart.updateColors(isLuxury);
   btcChart.updateColors(isLuxury);
   usdjpyChart.updateColors(isLuxury);
-  tnxChart.updateColors(isLuxury);
   goldChart.updateColors(isLuxury);
   qqqChart.updateColors(isLuxury);
 });
@@ -105,7 +103,6 @@ function updateCard(id, price, change, data) {
   if (id === 'fang') fangChart.updateData(data);
   if (id === 'btc') btcChart.updateData(data);
   if (id === 'usdjpy') usdjpyChart.updateData(data);
-  if (id === 'tnx') tnxChart.updateData(data);
   if (id === 'gold') goldChart.updateData(data);
   if (id === 'qqq') qqqChart.updateData(data);
 }
@@ -123,13 +120,12 @@ async function loadData() {
   const indicator = showRefreshIndicator();
   
   try {
-    // 並列実行（7つ同時にリクエスト） - エラーは各API関数内でキャッチ済み
-    const [sp500Data, fangData, btcData, usdjpyData, tnxData, goldData, qqqData] = await Promise.all([
+    // 並列実行（6つ同時にリクエスト） - エラーは各API関数内でキャッチ済み
+    const [sp500Data, fangData, btcData, usdjpyData, goldData, qqqData] = await Promise.all([
       fetchStockData('SPY'),
       fetchStockData('FNGS'),
       fetchBitcoinData(),
       fetchStockData('USD/JPY'),
-      fetchStockData('TNX'),
       fetchStockData('XAU/USD'),
       fetchStockData('QQQ')
     ]);
@@ -209,14 +205,7 @@ async function loadData() {
     showError('usdjpy', usdjpyData);
   }
 
-  // 5. US 10-Year Treasury
-  if (tnxData && !tnxData.error) {
-    updateCard('tnx', tnxData.current, tnxData.change, tnxData.historical);
-  } else {
-    showError('tnx', tnxData);
-  }
-
-  // 6. Gold
+  // 5. Gold
   if (goldData && !goldData.error) {
     updateCard('gold', goldData.current, goldData.change, goldData.historical);
   } else {
@@ -264,7 +253,6 @@ window.addEventListener('beforeunload', () => {
   fangChart.destroy();
   btcChart.destroy();
   usdjpyChart.destroy();
-  tnxChart.destroy();
   goldChart.destroy();
   qqqChart.destroy();
 });

@@ -107,12 +107,11 @@ async function updateMarketData() {
   try {
     // Fetch all data in parallel
     console.log('Fetching market data...');
-    const [spyData, fangData, btcData, usdjpyData, tnxData, goldData, qqqData] = await Promise.all([
+    const [spyData, fangData, btcData, usdjpyData, goldData, qqqData] = await Promise.all([
       fetchTwelveData('SPY'),
       fetchTwelveData('FNGS'),
       fetchBitcoinData(),
       fetchTwelveData('USD/JPY'),
-      fetchTwelveData('TNX'),
       fetchTwelveData('XAU/USD'),
       fetchTwelveData('QQQ')
     ]);
@@ -122,7 +121,6 @@ async function updateMarketData() {
       FANG: fangData,
       BTC: btcData,
       USDJPY: usdjpyData,
-      TNX: tnxData,
       GOLD: goldData,
       QQQ: qqqData
     };
@@ -140,7 +138,6 @@ async function updateMarketData() {
     console.log(`FANG: $${fangData.current} (${fangData.change > 0 ? '+' : ''}${fangData.change}%)`);
     console.log(`BTC: $${btcData.current} (${btcData.change > 0 ? '+' : ''}${btcData.change}%)`);
     console.log(`USD/JPY: ¥${usdjpyData.current} (${usdjpyData.change > 0 ? '+' : ''}${usdjpyData.change}%)`);
-    console.log(`TNX: ${tnxData.current}% (${tnxData.change > 0 ? '+' : ''}${tnxData.change}%)`);
     console.log(`GOLD: $${goldData.current} (${goldData.change > 0 ? '+' : ''}${goldData.change}%)`);
     console.log(`QQQ: $${qqqData.current} (${qqqData.change > 0 ? '+' : ''}${qqqData.change}%)`);
     console.log(`Output: ${outputPath}`);
