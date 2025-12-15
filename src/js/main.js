@@ -193,9 +193,9 @@ async function loadData() {
         warningBanner.textContent = `⚠️  Data is ${btcData.staleMinutes} min old`;
       }
     }
-    updateCard('btc', btcData.current, btcData.change, btcData.history);
+    updateCard('btc', btcData.current, btcData.change, btcData.historical);
   } else {
-    showError('btc', btcData || { error: true, message: 'CoinGecko API error' });
+    showError('btc', btcData);
   }
 
   // 4. USD/JPY

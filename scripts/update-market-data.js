@@ -105,16 +105,32 @@ async function updateMarketData() {
   }
   
   try {
-    // Fetch all data in parallel
-    console.log('Fetching market data...');
-    const [spyData, fangData, btcData, usdjpyData, goldData, qqqData] = await Promise.all([
-      fetchTwelveData('SPY'),
-      fetchTwelveData('FNGS'),
-      fetchBitcoinData(),
-      fetchTwelveData('USD/JPY'),
-      fetchTwelveData('XAU/USD'),
-      fetchTwelveData('QQQ')
-    ]);
+    // Fetch data sequentially with delay to avoid rate limits
+    // Twelve Data free tier: 8 requests/minute, we use 5 requests/minute for safety
+    console.log('Fetching market data (sequential with 200ms delay)...');
+    
+    console.log('  Fetching SPY...');
+    const spyData = await fetchTwelveData('SPY');
+    await sleep(200);
+    
+    console.log('  Fetching FNGS...');
+    const fangData = await fetchTwelveData('FNGS');
+    await sleep(200);
+    
+    console.log('  Fetching Bitcoin...');
+    const btcData = await fetchBitcoinData();
+    await sleep(200);
+    
+    console.log('  Fetching USD/JPY...');
+    const usdjpyData = await fetchTwelveData('USD/JPY');
+    await sleep(200);
+    
+    console.log('  Fetching Gold...');
+    const goldData = await fetchTwelveData('XAU/USD');
+    await sleep(200);
+    
+    console.log('  Fetching QQQ...');
+    const qqqData = await fetchTwelveData('QQQ');
     
     const marketData = {
       SPY: spyData,

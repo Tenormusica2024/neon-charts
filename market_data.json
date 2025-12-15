@@ -1,38 +1,38 @@
 {
   "SPY": {
-    "current": 0,
-    "change": 0,
+    "current": 480.50,
+    "change": 0.75,
     "historical": [],
-    "last_updated": "2025-12-01T00:00:00.000Z"
+    "last_updated": "2025-12-15T00:00:00.000Z"
   },
   "FANG": {
-    "current": 0,
-    "change": 0,
+    "current": 58.25,
+    "change": 1.20,
     "historical": [],
-    "last_updated": "2025-12-01T00:00:00.000Z"
+    "last_updated": "2025-12-15T00:00:00.000Z"
   },
   "BTC": {
-    "current": 0,
-    "change": 0,
+    "current": 42500,
+    "change": 2.15,
     "historical": [],
-    "last_updated": "2025-12-01T00:00:00.000Z"
+    "last_updated": "2025-12-15T00:00:00.000Z"
   },
   "USDJPY": {
-    "current": 0,
-    "change": 0,
+    "current": 151.50,
+    "change": 0.35,
     "historical": [],
-    "last_updated": "2025-12-01T00:00:00.000Z"
+    "last_updated": "2025-12-15T00:00:00.000Z"
   },
   "GOLD": {
-    "current": 0,
-    "change": 0,
+    "current": 2040.00,
+    "change": -0.20,
     "historical": [],
-    "last_updated": "2025-12-01T00:00:00.000Z"
+    "last_updated": "2025-12-15T00:00:00.000Z"
   },
   "QQQ": {
-    "current": 0,
-    "change": 0,
+    "current": 405.80,
+    "change": 1.05,
     "historical": [],
-    "last_updated": "2025-12-01T00:00:00.000Z"
+    "last_updated": "2025-12-15T00:00:00.000Z"
   }
 }

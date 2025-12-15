@@ -93,11 +93,11 @@ export async function fetchBitcoinData() {
     return {
       current: priceData.bitcoin.usd,
       change: priceData.bitcoin.usd_24h_change,
-      history: sortedHistory
+      historical: sortedHistory
     };
   } catch (error) {
     console.error('Error fetching Bitcoin data:', error);
-    return null;
+    return { error: true, message: error.message || 'CoinGecko API error' };
   }
 }
 
