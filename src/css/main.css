@@ -239,3 +239,24 @@ body {
   padding-top: 2rem;
   border-top: 1px solid var(--border-color);
 }
+
+.portfolio-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, var(--accent-color), var(--chart-up));
+  color: var(--bg-color);
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 243, 255, 0.2);
+}
+
+.portfolio-link:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 243, 255, 0.4);
+  filter: brightness(1.2);
+}
