@@ -14,7 +14,6 @@ const btcChart = new ChartManager('chart-btc', '#00f3ff');
 const usdjpyChart = new ChartManager('chart-usdjpy', '#00f3ff');
 const tnxChart = new ChartManager('chart-tnx', '#00f3ff');
 const goldChart = new ChartManager('chart-gold', '#00f3ff');
-const vixChart = new ChartManager('chart-vix', '#00f3ff');
 const qqqChart = new ChartManager('chart-qqq', '#00f3ff');
 
 // Initialize Theme Manager
@@ -25,7 +24,6 @@ const themeManager = new ThemeManager((isLuxury) => {
   usdjpyChart.updateColors(isLuxury);
   tnxChart.updateColors(isLuxury);
   goldChart.updateColors(isLuxury);
-  vixChart.updateColors(isLuxury);
   qqqChart.updateColors(isLuxury);
 });
 
@@ -109,7 +107,6 @@ function updateCard(id, price, change, data) {
   if (id === 'usdjpy') usdjpyChart.updateData(data);
   if (id === 'tnx') tnxChart.updateData(data);
   if (id === 'gold') goldChart.updateData(data);
-  if (id === 'vix') vixChart.updateData(data);
   if (id === 'qqq') qqqChart.updateData(data);
 }
 
@@ -126,15 +123,14 @@ async function loadData() {
   const indicator = showRefreshIndicator();
   
   try {
-    // 並列実行（8つ同時にリクエスト） - エラーは各API関数内でキャッチ済み
-    const [sp500Data, fangData, btcData, usdjpyData, tnxData, goldData, vixData, qqqData] = await Promise.all([
+    // 並列実行（7つ同時にリクエスト） - エラーは各API関数内でキャッチ済み
+    const [sp500Data, fangData, btcData, usdjpyData, tnxData, goldData, qqqData] = await Promise.all([
       fetchStockData('SPY'),
       fetchStockData('FNGS'),
       fetchBitcoinData(),
       fetchStockData('USD/JPY'),
       fetchStockData('TNX'),
       fetchStockData('XAU/USD'),
-      fetchStockData('VIX'),
       fetchStockData('QQQ')
     ]);
 
@@ -227,14 +223,7 @@ async function loadData() {
     showError('gold', goldData);
   }
 
-  // 7. VIX
-  if (vixData && !vixData.error) {
-    updateCard('vix', vixData.current, vixData.change, vixData.historical);
-  } else {
-    showError('vix', vixData);
-  }
-
-  // 8. Nasdaq 100
+  // 7. Nasdaq 100
   if (qqqData && !qqqData.error) {
     updateCard('qqq', qqqData.current, qqqData.change, qqqData.historical);
   } else {
@@ -277,6 +266,5 @@ window.addEventListener('beforeunload', () => {
   usdjpyChart.destroy();
   tnxChart.destroy();
   goldChart.destroy();
-  vixChart.destroy();
   qqqChart.destroy();
 });

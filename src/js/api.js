@@ -43,7 +43,6 @@ export async function fetchStockData(symbol) {
       'USD/JPY': 'USDJPY',
       'TNX': 'TNX',
       'XAU/USD': 'GOLD',
-      'VIX': 'VIX',
       'QQQ': 'QQQ'
     };
     
