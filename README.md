@@ -8,14 +8,37 @@ A professional, high-end financial dashboard featuring real-time market data and
   - **S&P 500**: Powered by Twelve Data API (SPY ETF)
   - **FANG+**: Powered by Twelve Data API (FNGS ETN)
   - **Bitcoin**: Powered by CoinGecko API
+  - **USD/JPY**: Powered by Twelve Data API (Forex)
+  - **US 10-Year Treasury**: Powered by Twelve Data API (^TNX)
+  - **Gold**: Powered by Twelve Data API (GC=F)
+  - **VIX (Fear Index)**: Powered by Twelve Data API (^VIX)
+  - **Nasdaq 100**: Powered by Twelve Data API (QQQ ETF)
 - **Dual Themes**:
   - **Neon Cyber**: Futuristic dark mode with cyan/pink accents.
   - **Luxury Professional**: Elegant charcoal and gold aesthetic.
 - **Robust Architecture**:
-  - Vercel Serverless Functions for API security and CORS handling.
-  - Auto-updating charts (10-minute interval).
+  - **GitHub Actions** automated data updates (daily at 14:30 UTC / 23:30 JST).
+  - Static JSON data storage (`market_data.json`) for fast, reliable access.
+  - Auto-refreshing charts every 10 minutes.
   - Responsive Grid Layout.
   - GitHub Pages frontend hosting.
+
+## ⚠️ Important Notes
+
+### yfinance Library Warning
+
+**DO NOT use `yfinance` library for this project.**
+
+- **Rate Limiting**: yfinance has strict rate limits that can block your requests
+- **Bot Detection**: Yahoo Finance actively detects and blocks automated access
+- **Unreliable**: Frequent downtime and API changes without notice
+- **Alternative**: Use Twelve Data API (official, stable, generous free tier)
+
+### API Rate Limits
+
+- **Twelve Data Free Tier**: 800 API calls/day
+- **Update Frequency**: Daily (1 update/day = 8 instruments × 1 call = 8 calls/day)
+- **Total Monthly Usage**: ~240 calls/month (well within free tier)
 
 ## Setup
 
@@ -100,25 +123,45 @@ A professional, high-end financial dashboard featuring real-time market data and
 ## Architecture
 
 ```
-┌─────────────────┐
-│  GitHub Pages   │
-│   (Frontend)    │
-└────────┬────────┘
+┌─────────────────────────┐
+│   GitHub Actions        │
+│   (Scheduled Workflow)  │
+│   Runs Daily 23:30 JST  │
+└────────┬────────────────┘
          │
-         │ HTTPS
-         │
-┌────────▼────────┐
-│ Vercel Function │
-│  (Backend API)  │
-└────────┬────────┘
+         │ Fetch & Update
          │
     ┌────┴────┐
     │         │
 ┌───▼──┐  ┌──▼────┐
 │Twelve│  │CoinGe-│
 │Data  │  │cko    │
-└──────┘  └───────┘
+└───┬──┘  └──┬────┘
+    │         │
+    └────┬────┘
+         │
+         │ Write
+         ▼
+┌─────────────────┐
+│market_data.json │
+│ (Static Data)   │
+└────────┬────────┘
+         │
+         │ Read (every 10min)
+         │
+┌────────▼────────┐
+│  GitHub Pages   │
+│   (Frontend)    │
+└─────────────────┘
 ```
+
+### Data Flow
+
+1. **GitHub Actions** runs daily at 23:30 JST (after US market close)
+2. **update-market-data.js** fetches latest data from Twelve Data & CoinGecko
+3. **market_data.json** is updated with new data
+4. **GitHub Pages** is automatically rebuilt and deployed
+5. **Frontend** reads from static JSON (no API keys needed in browser)
 
 ## License
 

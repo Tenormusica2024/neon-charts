@@ -11,12 +11,22 @@ const API_REFRESH_INTERVAL_MINUTES = 10;
 const sp500Chart = new ChartManager('chart-sp500', '#00f3ff');
 const fangChart = new ChartManager('chart-fang', '#00f3ff');
 const btcChart = new ChartManager('chart-btc', '#00f3ff');
+const usdjpyChart = new ChartManager('chart-usdjpy', '#00f3ff');
+const tnxChart = new ChartManager('chart-tnx', '#00f3ff');
+const goldChart = new ChartManager('chart-gold', '#00f3ff');
+const vixChart = new ChartManager('chart-vix', '#00f3ff');
+const qqqChart = new ChartManager('chart-qqq', '#00f3ff');
 
 // Initialize Theme Manager
 const themeManager = new ThemeManager((isLuxury) => {
   sp500Chart.updateColors(isLuxury);
   fangChart.updateColors(isLuxury);
   btcChart.updateColors(isLuxury);
+  usdjpyChart.updateColors(isLuxury);
+  tnxChart.updateColors(isLuxury);
+  goldChart.updateColors(isLuxury);
+  vixChart.updateColors(isLuxury);
+  qqqChart.updateColors(isLuxury);
 });
 
 // 共通エラー処理関数
@@ -96,6 +106,11 @@ function updateCard(id, price, change, data) {
   if (id === 'sp500') sp500Chart.updateData(data);
   if (id === 'fang') fangChart.updateData(data);
   if (id === 'btc') btcChart.updateData(data);
+  if (id === 'usdjpy') usdjpyChart.updateData(data);
+  if (id === 'tnx') tnxChart.updateData(data);
+  if (id === 'gold') goldChart.updateData(data);
+  if (id === 'vix') vixChart.updateData(data);
+  if (id === 'qqq') qqqChart.updateData(data);
 }
 
 function showRefreshIndicator() {
@@ -111,11 +126,16 @@ async function loadData() {
   const indicator = showRefreshIndicator();
   
   try {
-    // 並列実行（3つ同時にリクエスト） - エラーは各API関数内でキャッチ済み
-    const [sp500Data, fangData, btcData] = await Promise.all([
+    // 並列実行（8つ同時にリクエスト） - エラーは各API関数内でキャッチ済み
+    const [sp500Data, fangData, btcData, usdjpyData, tnxData, goldData, vixData, qqqData] = await Promise.all([
       fetchStockData('SPY'),
       fetchStockData('FNGS'),
-      fetchBitcoinData()
+      fetchBitcoinData(),
+      fetchStockData('USD/JPY'),
+      fetchStockData('^TNX'),
+      fetchStockData('GC=F'),
+      fetchStockData('^VIX'),
+      fetchStockData('QQQ')
     ]);
 
   // 1. S&P 500 (Using SPY ETF as proxy)
@@ -185,6 +205,41 @@ async function loadData() {
   } else {
     showError('btc', btcData || { error: true, message: 'CoinGecko API error' });
   }
+
+  // 4. USD/JPY
+  if (usdjpyData && !usdjpyData.error) {
+    updateCard('usdjpy', usdjpyData.current, usdjpyData.change, usdjpyData.historical);
+  } else {
+    showError('usdjpy', usdjpyData);
+  }
+
+  // 5. US 10-Year Treasury
+  if (tnxData && !tnxData.error) {
+    updateCard('tnx', tnxData.current, tnxData.change, tnxData.historical);
+  } else {
+    showError('tnx', tnxData);
+  }
+
+  // 6. Gold
+  if (goldData && !goldData.error) {
+    updateCard('gold', goldData.current, goldData.change, goldData.historical);
+  } else {
+    showError('gold', goldData);
+  }
+
+  // 7. VIX
+  if (vixData && !vixData.error) {
+    updateCard('vix', vixData.current, vixData.change, vixData.historical);
+  } else {
+    showError('vix', vixData);
+  }
+
+  // 8. Nasdaq 100
+  if (qqqData && !qqqData.error) {
+    updateCard('qqq', qqqData.current, qqqData.change, qqqData.historical);
+  } else {
+    showError('qqq', qqqData);
+  }
   } finally {
     indicator?.remove();
   }
@@ -219,4 +274,9 @@ window.addEventListener('beforeunload', () => {
   sp500Chart.destroy();
   fangChart.destroy();
   btcChart.destroy();
+  usdjpyChart.destroy();
+  tnxChart.destroy();
+  goldChart.destroy();
+  vixChart.destroy();
+  qqqChart.destroy();
 });

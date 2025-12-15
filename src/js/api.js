@@ -37,7 +37,17 @@ export async function fetchStockData(symbol) {
     const marketData = await fetchMarketData();
     
     // Map symbol to data key
-    const dataKey = symbol === 'SPY' ? 'SPY' : symbol === 'FNGS' ? 'FANG' : null;
+    const symbolMap = {
+      'SPY': 'SPY',
+      'FNGS': 'FANG',
+      'USD/JPY': 'USDJPY',
+      '^TNX': 'TNX',
+      'GC=F': 'GOLD',
+      '^VIX': 'VIX',
+      'QQQ': 'QQQ'
+    };
+    
+    const dataKey = symbolMap[symbol];
     
     if (!dataKey || !marketData[dataKey]) {
       throw new Error(`No data available for ${symbol}`);
