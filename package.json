@@ -1,8 +1,9 @@
 {
-  "name": "neon_charts",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "neon-charts",
+  "version": "2.0.0",
+  "description": "Professional financial dashboard with real-time market data and switchable themes",
+  "main": "index.html",
+  "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "vite build --base=/neon-charts/",
@@ -10,17 +11,14 @@
     "update-data": "node scripts/update-market-data.js",
     "test": "jest --verbose"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["finance", "dashboard", "charts", "market-data", "stocks", "cryptocurrency"],
+  "author": "Tenormusica",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
     "dotenv": "^17.2.3",
-    "express": "^5.1.0",
     "lightweight-charts": "^5.0.9",
     "node-fetch": "^3.3.2",
-    "vite": "^7.2.4",
-    "yahoo-finance2": "^3.10.2"
+    "vite": "^7.2.4"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",

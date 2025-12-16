@@ -1,5 +1,11 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export default defineConfig({
   base: '/neon-charts/',
@@ -17,9 +23,6 @@ export default defineConfig({
     {
       name: 'copy-assets',
       writeBundle() {
-        const fs = require('fs');
-        const path = require('path');
-        
         // market_data.json をコピー
         const dataSrc = path.resolve(__dirname, 'market_data.json');
         const dataDest = path.resolve(__dirname, 'dist', 'market_data.json');
