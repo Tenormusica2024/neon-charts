@@ -1,7 +1,7 @@
 {
   "SPY": {
-    "current": 691.57,
-    "change": 0.17,
+    "current": 690.31,
+    "change": -0.01,
     "historical": [
       {
         "time": "2025-11-13",
@@ -121,14 +121,14 @@
       },
       {
         "time": "2025-12-26",
-        "value": 691.57
+        "value": 690.31
       }
     ],
-    "last_updated": "2025-12-26T14:47:02.835Z"
+    "last_updated": "2025-12-27T14:44:27.897Z"
   },
   "FANG": {
-    "current": 69.31,
-    "change": 0.16,
+    "current": 69.2,
+    "change": 0,
     "historical": [
       {
         "time": "2025-11-13",
@@ -248,25 +248,21 @@
       },
       {
         "time": "2025-12-26",
-        "value": 69.31
+        "value": 69.2
       }
     ],
-    "last_updated": "2025-12-26T14:47:03.143Z"
+    "last_updated": "2025-12-27T14:44:28.195Z"
   },
   "BTC": {
-    "current": 88348,
-    "change": 0.88,
+    "current": 87421,
+    "change": -1.05,
     "historical": [],
-    "last_updated": "2025-12-26T14:47:03.391Z"
+    "last_updated": "2025-12-27T14:44:28.420Z"
   },
   "USDJPY": {
-    "current": 156.42,
-    "change": 0.45,
+    "current": 156.58,
+    "change": 0.03,
     "historical": [
-      {
-        "time": "2025-11-22",
-        "value": 156.37801
-      },
       {
         "time": "2025-11-24",
         "value": 156.75587
@@ -381,19 +377,19 @@
       },
       {
         "time": "2025-12-26",
-        "value": 156.42216
+        "value": 156.533
+      },
+      {
+        "time": "2025-12-27",
+        "value": 156.58008
       }
     ],
-    "last_updated": "2025-12-26T14:47:04.630Z"
+    "last_updated": "2025-12-27T14:44:28.699Z"
   },
   "GOLD": {
-    "current": 4520.77,
-    "change": 0.92,
+    "current": 4532.69,
+    "change": 0.2,
     "historical": [
-      {
-        "time": "2025-11-27",
-        "value": 4157.99178
-      },
       {
         "time": "2025-11-28",
         "value": 4212.73023
@@ -508,14 +504,18 @@
       },
       {
         "time": "2025-12-26",
-        "value": 4520.77463
+        "value": 4523.58231
+      },
+      {
+        "time": "2025-12-27",
+        "value": 4532.69019
       }
     ],
-    "last_updated": "2025-12-26T14:47:05.240Z"
+    "last_updated": "2025-12-27T14:44:28.981Z"
   },
   "QQQ": {
-    "current": 625.37,
-    "change": 0.23,
+    "current": 623.89,
+    "change": -0.01,
     "historical": [
       {
         "time": "2025-11-13",
@@ -635,9 +635,9 @@
       },
       {
         "time": "2025-12-26",
-        "value": 625.37
+        "value": 623.89001
       }
     ],
-    "last_updated": "2025-12-26T14:47:05.534Z"
+    "last_updated": "2025-12-27T14:44:29.262Z"
   }
 }
