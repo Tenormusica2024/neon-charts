@@ -1,7 +1,7 @@
 {
   "SPY": {
-    "current": 691.82,
-    "change": -0.32,
+    "current": 691.97,
+    "change": -0.3,
     "historical": [
       {
         "time": "2025-12-18",
@@ -121,14 +121,14 @@
       },
       {
         "time": "2026-01-30",
-        "value": 691.82
+        "value": 691.96997
       }
     ],
-    "last_updated": "2026-01-30T15:04:32.402Z"
+    "last_updated": "2026-01-31T14:51:49.078Z"
   },
   "FANG": {
-    "current": 66.5,
-    "change": 0.03,
+    "current": 65.99,
+    "change": -0.73,
     "historical": [
       {
         "time": "2025-12-17",
@@ -248,25 +248,21 @@
       },
       {
         "time": "2026-01-30",
-        "value": 66.5
+        "value": 65.994
       }
     ],
-    "last_updated": "2026-01-30T15:04:32.863Z"
+    "last_updated": "2026-01-31T14:51:49.335Z"
   },
   "BTC": {
-    "current": 83045,
-    "change": -3.82,
+    "current": 81024,
+    "change": -2.84,
     "historical": [],
-    "last_updated": "2026-01-30T15:04:33.210Z"
+    "last_updated": "2026-01-31T14:51:49.667Z"
   },
   "USDJPY": {
-    "current": 154.56,
-    "change": 0.96,
+    "current": 154.75,
+    "change": 0.1,
     "historical": [
-      {
-        "time": "2025-12-31",
-        "value": 156.60804
-      },
       {
         "time": "2026-01-01",
         "value": 156.70872
@@ -381,19 +377,19 @@
       },
       {
         "time": "2026-01-30",
-        "value": 154.55725
+        "value": 154.59254
+      },
+      {
+        "time": "2026-01-31",
+        "value": 154.74538
       }
     ],
-    "last_updated": "2026-01-30T15:04:33.980Z"
+    "last_updated": "2026-01-31T14:51:49.910Z"
   },
   "GOLD": {
-    "current": 4998.02,
-    "change": -5.88,
+    "current": 4865.36,
+    "change": -1.52,
     "historical": [
-      {
-        "time": "2026-01-01",
-        "value": 4315.16528
-      },
       {
         "time": "2026-01-02",
         "value": 4319.3054
@@ -508,14 +504,18 @@
       },
       {
         "time": "2026-01-30",
-        "value": 4998.01776
+        "value": 4940.66781
+      },
+      {
+        "time": "2026-01-31",
+        "value": 4865.35699
       }
     ],
-    "last_updated": "2026-01-30T15:04:35.187Z"
+    "last_updated": "2026-01-31T14:51:50.164Z"
   },
   "QQQ": {
-    "current": 625.77,
-    "change": -0.58,
+    "current": 621.87,
+    "change": -1.2,
     "historical": [
       {
         "time": "2025-12-17",
@@ -635,9 +635,9 @@
       },
       {
         "time": "2026-01-30",
-        "value": 625.77
+        "value": 621.87
       }
     ],
-    "last_updated": "2026-01-30T15:04:36.480Z"
+    "last_updated": "2026-01-31T14:51:50.434Z"
   }
 }
