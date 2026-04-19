@@ -1,8 +1,12 @@
 node_modules
 .env
 .env.local
+.env*.local
 .DS_Store
 dist
 push_to_github.bat
 .vercel
-.env*.local
+
+# Local agent / tooling state (should never be committed)
+.letta/
+.claude/
