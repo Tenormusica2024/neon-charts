@@ -38,7 +38,7 @@
     "lightweight-charts": "^5.0.9"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
+    "@babel/core": "^8.0.1",
     "@babel/preset-env": "^7.28.5",
     "babel-jest": "^30.2.0",
     "cors": "^2.8.5",
